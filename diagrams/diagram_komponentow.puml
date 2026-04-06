@@ -1,0 +1,74 @@
+@startuml
+skinparam componentStyle rectangle
+
+package "Frontend (React SPA)" {
+    [App] as app
+    [Router] as router
+    [AuthProvider] as auth
+
+    package "Strony" {
+        [DashboardPage] as dashboard
+        [TasksPage] as tasks
+        [BoardPage] as board
+        [TaskForm] as form
+        [TaskDetailPage] as detail
+    }
+
+    package "Komponenty UI" {
+        [Header] as header
+        [Sidebar] as sidebar
+        [MobileNav] as mobile
+        [TaskFilters] as filters
+        [BoardColumn] as column
+        [TaskSummaryCards] as summary
+    }
+
+    package "Komponenty bazowe (shadcn/ui)" {
+        [Button] as btn
+        [Input] as input
+        [Select] as select
+        [Card] as card
+        [Badge] as badge
+    }
+}
+
+package "Backend (REST API)" {
+    [TaskController] as taskCtrl
+    [UserController] as userCtrl
+    [TaskService] as taskSvc
+    [UserService] as userSvc
+    [TaskRepository] as taskRepo
+    [UserRepository] as userRepo
+}
+
+package "Zewnętrzne" {
+    database "PostgreSQL" as db
+    [Keycloak] as kc
+}
+
+app --> router
+app --> auth
+router --> dashboard
+router --> tasks
+router --> board
+router --> form
+router --> detail
+
+tasks --> filters
+board --> column
+dashboard --> summary
+
+taskCtrl --> taskSvc
+userCtrl --> userSvc
+taskSvc --> taskRepo
+userSvc --> userRepo
+taskRepo --> db
+userRepo --> db
+
+auth --> kc
+userCtrl --> kc
+
+app --> taskCtrl : REST API\n(/api/tasks)
+app --> userCtrl : REST API\n(/api/users)
+
+@enduml

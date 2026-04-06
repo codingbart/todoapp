@@ -1,0 +1,44 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class User {
+    - id: UUID
+    - name: String
+    - email: String
+    - keycloakId: String
+    --
+    + getTasks(): List<Task>
+}
+
+class Task {
+    - id: UUID
+    - title: String
+    - description: String
+    - status: TaskStatus
+    - priority: TaskPriority
+    - dueDate: Date
+    - createdAt: DateTime
+    - updatedAt: DateTime
+    --
+    + changeStatus(status: TaskStatus): void
+    + setPriority(priority: TaskPriority): void
+    + setDueDate(date: Date): void
+}
+
+enum TaskStatus {
+    TODO
+    IN_PROGRESS
+    DONE
+}
+
+enum TaskPriority {
+    LOW
+    MEDIUM
+    HIGH
+}
+
+User "1" --> "0..*" Task : posiada >
+Task --> TaskStatus : ma status >
+Task --> TaskPriority : ma priorytet >
+
+@enduml
