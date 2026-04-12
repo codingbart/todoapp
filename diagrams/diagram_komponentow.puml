@@ -9,7 +9,6 @@ package "Frontend (React SPA)" {
     package "Strony" {
         [DashboardPage] as dashboard
         [TasksPage] as tasks
-        [BoardPage] as board
         [TaskForm] as form
         [TaskDetailPage] as detail
     }
@@ -18,8 +17,6 @@ package "Frontend (React SPA)" {
         [Header] as header
         [Sidebar] as sidebar
         [MobileNav] as mobile
-        [TaskFilters] as filters
-        [BoardColumn] as column
         [TaskSummaryCards] as summary
     }
 
@@ -50,12 +47,9 @@ app --> router
 app --> auth
 router --> dashboard
 router --> tasks
-router --> board
 router --> form
 router --> detail
 
-tasks --> filters
-board --> column
 dashboard --> summary
 
 taskCtrl --> taskSvc

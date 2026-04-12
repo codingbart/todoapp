@@ -16,13 +16,11 @@ class Task {
     - description: String
     - status: TaskStatus
     - priority: TaskPriority
-    - dueDate: Date
     - createdAt: DateTime
     - updatedAt: DateTime
     --
     + changeStatus(status: TaskStatus): void
     + setPriority(priority: TaskPriority): void
-    + setDueDate(date: Date): void
 }
 
 enum TaskStatus {
