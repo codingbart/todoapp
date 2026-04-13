@@ -22,9 +22,9 @@
 }
 
 \title{\LARGE\bfseries Kamień Milowy I -- Analiza i Projekt Systemu\\[0.8cm]
-  {\Large Aplikacja do zarządzania zadaniami (Todo App)}}
+  {\Large Aplikacja do zarządzania zadaniami}}
 \author{Bartłomiej Karkoszka \and Rafał Grot \and Filip Stępień}
-\date{Grupa: 1ID21A\\Przedmiot: MASI}
+\date{Przedmiot: Modelowanie i Analiza Systemów Informatycznych\\Grupa: 1ID21A}
 
 \raggedbottom
 
@@ -50,12 +50,11 @@ Celem systemu jest umożliwienie użytkownikom efektywnego zarządzania zadaniam
 \subsection{Zakres}
 System obejmuje:
 \begin{itemize}
-  \item rejestrację i uwierzytelnianie użytkowników (z wykorzystaniem Keycloak),
-  \item pełne operacje CRUD na zadaniach (tworzenie, odczyt, edycja, usuwanie),
+  \item rejestrację i uwierzytelnianie użytkowników (z wykorzystaniem serwisu Keycloak),
+  \item zarządzanie zadaniami: tworzenie z~tytułem, opisem, priorytetem i~terminem realizacji, edycja oraz usuwanie,
   \item kategoryzację zadań według statusu (Do zrobienia, W~trakcie, Zrobione) i~priorytetu (Niski, Średni, Wysoki),
-  \item widok listy zadań z filtrowaniem i wyszukiwaniem,
-  \item panel główny (dashboard) z podsumowaniem statystyk zadań,
-  \item przypisywanie terminów realizacji do zadań.
+  \item widok listy zadań z~możliwością filtrowania,
+  \item panel główny (dashboard) z podsumowaniem statystyk zadań.
 \end{itemize}
 
 % ============================================================
@@ -63,18 +62,10 @@ System obejmuje:
 % ============================================================
 \section{Aktorzy systemu}
 
-\begin{table}[H]
-  \centering
-  \begin{tabular}{>{\bfseries}l p{10cm}}
-    \toprule
-    Aktor      & Opis                                                                                                      \\
-    \midrule
-    Użytkownik & Osoba korzystająca z systemu -- tworzy, edytuje, przegląda i~usuwa zadania. Posiada konto w~systemie.     \\[0.3cm]
-    Gość       & Osoba nieposiadająca konta lub niezalogowana -- może jedynie przejść do strony logowania lub rejestracji. \\[0.3cm]
-    Keycloak   & System zewnętrzny odpowiedzialny za uwierzytelnianie i~autoryzację użytkowników.                          \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\begin{itemize}
+  \item \textbf{Użytkownik} -- osoba korzystająca z systemu, która może się zalogować, zarejestrować oraz tworzyć, edytować, przeglądać i~usuwać zadania.
+  \item \textbf{Keycloak} -- system zewnętrzny odpowiedzialny za uwierzytelnianie i~autoryzację użytkowników.
+\end{itemize}
 
 % ============================================================
 % 3. DIAGRAM PRZYPADKÓW UŻYCIA
@@ -85,73 +76,41 @@ System obejmuje:
   \includegraphics[width=0.9\textwidth]{diagrams/przypadki_uzycia.png}
 \end{center}
 
-Diagram przedstawia następujące przypadki użycia:
-\begin{itemize}
-  \item \textbf{Gość} może zalogować się lub zarejestrować (oba przypadki delegowane do Keycloak).
-  \item \textbf{Użytkownik} po zalogowaniu ma dostęp do pełnej funkcjonalności: zarządzania zadaniami i~dashboardu.
-  \item Tworzenie i edycja zadania zawierają (\texttt{<<include>>}) ustawianie priorytetu i~terminu realizacji.
-\end{itemize}
-
 % ============================================================
 % 4. WYMAGANIA FUNKCJONALNE
 % ============================================================
 \section{Wymagania funkcjonalne}
 
-\begin{table}[H]
-  \centering
-  \begin{tabular}{p{11cm} l}
-    \toprule
-    \textbf{Wymaganie}                                                                             & \textbf{Priorytet} \\
-    \midrule
-    System umożliwia rejestrację nowego użytkownika poprzez Keycloak                               & Wysoki             \\[0.15cm]
-    System umożliwia logowanie użytkownika poprzez Keycloak                                        & Wysoki             \\[0.15cm]
-    System umożliwia wylogowanie użytkownika                                                       & Wysoki             \\[0.15cm]
-    System umożliwia tworzenie nowego zadania z~tytułem, opisem, priorytetem i~terminem realizacji & Wysoki             \\[0.15cm]
-    System umożliwia edycję istniejącego zadania                                                   & Wysoki             \\[0.15cm]
-    System umożliwia usuwanie zadania                                                              & Wysoki             \\[0.15cm]
-    System umożliwia wyświetlanie listy wszystkich zadań użytkownika                               & Wysoki             \\[0.15cm]
-    System wyświetla panel dashboard z~podsumowaniem liczby zadań w~poszczególnych statusach       & Niski              \\[0.15cm]
-    System umożliwia zmianę statusu zadania                                                        & Wysoki             \\[0.15cm]
-    System umożliwia przypisanie priorytetu do zadania                                             & Wysoki             \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\begin{itemize}
+  \item Uwierzytelnianie i~autoryzacja użytkowników poprzez serwis Keycloak (rejestracja, logowanie, wylogowanie)
+  \item Zarządzanie zadaniami: tworzenie z~tytułem, opisem, priorytetem i~terminem realizacji, edycja oraz usuwanie
+  \item Wyświetlanie listy wszystkich zadań użytkownika
+  \item Zmiana statusu zadania
+  \item Przypisanie priorytetu do zadania
+  \item Wyświetlanie panelu dashboard z~podsumowaniem liczby zadań w~poszczególnych statusach
+\end{itemize}
 
 % ============================================================
 % 5. WYMAGANIA NIEFUNKCJONALNE
 % ============================================================
 \section{Wymagania niefunkcjonalne}
 
-\begin{table}[H]
-  \centering
-  \begin{tabular}{p{11cm} l}
-    \toprule
-    \textbf{Wymaganie}                                                                             & \textbf{Kategoria} \\
-    \midrule
-    Interfejs użytkownika musi być responsywny (desktop, tablet, mobile)                           & Użyteczność        \\[0.15cm]
-    System musi obsługiwać przeglądarki Chrome, Firefox i~Safari w~najnowszych wersjach            & Kompatybilność     \\[0.15cm]
-    Czas odpowiedzi API nie powinien przekraczać 500ms dla operacji CRUD                           & Wydajność          \\[0.15cm]
-    Uwierzytelnianie musi być realizowane przez zewnętrzny serwer Keycloak (OAuth2/OpenID Connect) & Bezpieczeństwo     \\[0.15cm]
-    Hasła użytkowników nie są przechowywane bezpośrednio w~systemie (delegacja do Keycloak)        & Bezpieczeństwo     \\[0.15cm]
-    Frontend musi być zbudowany w~oparciu o~React~19 z~TypeScript                                  & Technologia        \\[0.15cm]
-    Backend musi udostępniać REST API                                                              & Technologia        \\[0.15cm]
-    Dane muszą być przechowywane w~relacyjnej bazie danych (PostgreSQL)                            & Technologia        \\[0.15cm]
-    System powinien być łatwo wdrażalny za pomocą kontenerów Docker                                & Wdrożenie          \\[0.15cm]
-    Kod źródłowy musi być wersjonowany w~repozytorium Git                                          & Utrzymanie         \\[0.15cm]
-    System powinien obsługiwać jednocześnie co najmniej 50~użytkowników                            & Wydajność          \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\begin{itemize}
+  \item Interfejs użytkownika musi być responsywny (desktop, tablet, mobile)
+  \item Uwierzytelnianie musi być realizowane przez zewnętrzny serwer Keycloak -- hasła użytkowników nie są przechowywane bezpośrednio w~systemie
+  \item System powinien być łatwo wdrażalny za pomocą kontenerów Docker
+  \item Kod źródłowy musi być wersjonowany w~repozytorium Git
+\end{itemize}
 
 % ============================================================
 % 6. WSTĘPNY DIAGRAM KLAS
 % ============================================================
-\clearpage
 \section{Wstępny diagram klas}
 
-\begin{center}
+\begin{figure}[h!]
+  \centering
   \includegraphics[width=0.65\textwidth]{diagrams/diagram_klas.png}
-\end{center}
+\end{figure}
 
 Model dziedziny obejmuje następujące klasy:
 \begin{itemize}
@@ -192,8 +151,8 @@ Komunikacja między frontendem a backendem odbywa się przez REST API pod ście�
 
 Architektura systemu oparta jest na modelu warstwowym:
 \begin{enumerate}
-  \item \textbf{Warstwa prezentacji} -- aplikacja React SPA z~Tailwind CSS i~React Router.
-  \item \textbf{Warstwa API} -- komunikacja REST (HTTP/JSON) między frontendem a backendem, z~wykorzystaniem proxy Vite w~trybie deweloperskim.
+  \item \textbf{Warstwa prezentacji} -- aplikacja React SPA z~Tailwind CSS, React Router oraz gotowymi komponentami shadcn/ui.
+  \item \textbf{Warstwa API} -- komunikacja REST (HTTP/JSON) między frontendem a backendem.
   \item \textbf{Warstwa logiki biznesowej} -- kontrolery, serwisy oraz reguły walidacji.
   \item \textbf{Warstwa dostępu do danych} -- repozytoria i~mapowanie obiektowo-relacyjne (ORM).
   \item \textbf{Warstwa danych} -- relacyjna baza danych PostgreSQL.
@@ -206,39 +165,26 @@ Warstwa bezpieczeństwa (Keycloak, tokeny JWT) jest warstwą przekrojową, przen
 % ============================================================
 \section{Słownik pojęć}
 
-\begin{table}[H]
-  \centering
-  \begin{tabular}{>{\bfseries}l p{10cm}}
-    \toprule
-    Pojęcie        & Definicja                                                                                              \\
-    \midrule
-    Zadanie (Task) & Podstawowa jednostka pracy w~systemie, posiadająca tytuł, opis, status, priorytet i~termin realizacji. \\[0.2cm]
-    Status         & Stan realizacji zadania: Do zrobienia (TODO), W~trakcie (IN\_PROGRESS), Zrobione (DONE).               \\[0.2cm]
-    Priorytet      & Poziom ważności zadania: Niski (LOW), Średni (MEDIUM), Wysoki (HIGH).                                  \\[0.2cm]
-    Dashboard      & Panel główny z~podsumowaniem statystyk zadań użytkownika.                                              \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\begin{itemize}
+  \item \textbf{Zadanie (Task)} -- główna encja systemu, z~którą użytkownik prowadzi interakcje; posiada tytuł, opis, status, priorytet i~termin realizacji.
+  \item \textbf{Status} -- stan realizacji zadania: Do zrobienia, W~trakcie, Zrobione.
+  \item \textbf{Priorytet} -- poziom ważności zadania: Niski, Średni, Wysoki.
+  \item \textbf{Dashboard} -- panel główny z~podsumowaniem statystyk zadań użytkownika.
+  \item \textbf{JWT (JSON Web Token)} -- token używany do przekazywania informacji o~tożsamości i~uprawnieniach użytkownika między frontendem a backendem.
+\end{itemize}
 
 % ============================================================
 % 10. STOS TECHNOLOGICZNY
 % ============================================================
 \section{Stos technologiczny}
 
-\begin{table}[H]
-  \centering
-  \begin{tabular}{>{\bfseries}l p{10cm}}
-    \toprule
-    Warstwa          & Technologia                                                             \\
-    \midrule
-    Frontend         & React 19, TypeScript, Vite, Tailwind CSS v4, shadcn/ui, React Router v7 \\
-    Backend          & Spring Boot (Java) lub Go -- w~trakcie decyzji                          \\
-    Baza danych      & PostgreSQL                                                              \\
-    Uwierzytelnianie & Keycloak (OAuth2 / OpenID Connect)                                      \\
-    Konteneryzacja   & Docker, Docker Compose                                                  \\
-    Kontrola wersji  & Git                                                                     \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\begin{itemize}
+  \item \textbf{Frontend:} React 19, TypeScript, Vite, Tailwind CSS v4, shadcn/ui, React Router v7
+  \item \textbf{Backend:} Spring Boot (Java)
+  \item \textbf{Baza danych:} PostgreSQL
+  \item \textbf{Uwierzytelnianie:} Keycloak (OAuth2 / OpenID Connect)
+  \item \textbf{Konteneryzacja:} Docker, Docker Compose
+  \item \textbf{Kontrola wersji:} Git
+\end{itemize}
 
 \end{document}

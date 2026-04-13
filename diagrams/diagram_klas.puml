@@ -16,6 +16,7 @@ class Task {
     - description: String
     - status: TaskStatus
     - priority: TaskPriority
+    - dueDate: Date
     - createdAt: DateTime
     - updatedAt: DateTime
     --
@@ -35,7 +36,7 @@ enum TaskPriority {
     HIGH
 }
 
-User "1" --> "0..*" Task : posiada >
+User "1" -- "0..*" Task : posiada >
 Task --> TaskStatus : ma status >
 Task --> TaskPriority : ma priorytet >
 

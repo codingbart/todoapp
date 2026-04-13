@@ -1,38 +1,18 @@
 @startuml
-skinparam rectangleRoundCorner 10
+skinparam rectangleRoundCorner 8
 skinparam rectangleBorderColor #444
-skinparam packageStyle frame
+skinparam defaultTextAlignment center
+skinparam rectangleFontSize 13
 
-rectangle "Warstwa prezentacji (Frontend)" as presentation #E0F7FA {
-    rectangle "React SPA (Vite + TypeScript)" as react
-    rectangle "shadcn/ui + Tailwind CSS" as ui
-    rectangle "React Router" as routing
+together {
+    rectangle "<b>Warstwa prezentacji</b>\nReact SPA\nshadcn/ui\nTailwind CSS\nReact Router" as presentation
+    rectangle "<b>Warstwa API</b>\nREST API (HTTP/JSON)" as api_layer
+    rectangle "<b>Warstwa logiki biznesowej</b>\nKontrolery\nSerwisy\nWalidacja" as business
+    rectangle "<b>Warstwa dostępu do danych</b>\nRepozytoria\nORM" as data_access
+    rectangle "<b>Warstwa danych</b>\nPostgreSQL" as data
 }
 
-rectangle "Warstwa API (komunikacja)" as api_layer #FFF9C4 {
-    rectangle "REST API (HTTP/JSON)" as rest
-    rectangle "Vite Proxy (/api -> backend)" as proxy
-}
-
-rectangle "Warstwa logiki biznesowej (Backend)" as business #C8E6C9 {
-    rectangle "Kontrolery (TaskController, UserController)" as controllers
-    rectangle "Serwisy (TaskService, UserService)" as services
-    rectangle "Walidacja i reguly biznesowe" as validation
-}
-
-rectangle "Warstwa dostepu do danych" as data_access #FFCCBC {
-    rectangle "Repozytoria (TaskRepository, UserRepository)" as repos
-    rectangle "ORM / mapowanie obiektowo-relacyjne" as orm
-}
-
-rectangle "Warstwa danych" as data #E1BEE7 {
-    database "PostgreSQL" as db
-}
-
-rectangle "Warstwa bezpieczenstwa (przekrojowa)" as security #FFCDD2 {
-    rectangle "Keycloak (OAuth2 / OpenID Connect)" as kc
-    rectangle "JWT Token" as jwt
-}
+rectangle "<b>Bezpieczeństwo</b>\nKeycloak\nJWT" as security
 
 presentation -down-> api_layer
 api_layer -down-> business
@@ -40,6 +20,7 @@ business -down-> data_access
 data_access -down-> data
 
 security -right-> presentation : ochrona tras
+security -right-> api_layer : weryfikacja tokenów
 security -right-> business : autoryzacja
 
 @enduml
