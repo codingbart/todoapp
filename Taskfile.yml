@@ -1,0 +1,10 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmd: task --list
+
+  docker:up:
+    desc: Start all containers in background
+    cmd: docker compose up -d
