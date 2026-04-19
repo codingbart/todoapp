@@ -1,15 +1,19 @@
 package main
 
 import (
-	"log"
 	"os"
+
+	"github.com/codingbart/todoapp/task-api/internal/config"
+	"github.com/codingbart/todoapp/task-api/internal/logger"
 )
 
 func main() {
-	app := NewApplication(":8080")
+	log := logger.NewSlog()
+	cfg := config.NewConfig(log)
+	app := NewApplication(cfg, log)
 
 	if err := app.Run(app.Mount()); err != nil {
-		log.Printf("Error: %s", err.Error())
+		log.Error("Error: %s", err.Error())
 		os.Exit(1)
 	}
 }
