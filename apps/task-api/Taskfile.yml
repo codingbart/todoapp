@@ -1,0 +1,50 @@
+version: "3"
+
+vars:
+  API_CMD: ./cmd/api
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  tools:
+    desc: Install Go tools
+    cmds:
+      - go install tool
+
+  dev:
+    desc: Run Go API with live reload
+    cmds:
+      - go tool air
+
+  run:
+    desc: Run Go API
+    cmds:
+      - go run {{.API_CMD}}
+
+  build:
+    desc: Build Go API
+    cmds:
+      - go build {{.API_CMD}}
+
+  test:
+    desc: Run Go tests
+    cmds:
+      - go test ./...
+
+  fmt:
+    desc: Format Go code
+    cmds:
+      - go fmt ./...
+
+  vet:
+    desc: Run Go vet
+    cmds:
+      - go vet ./...
+
+  tidy:
+    desc: Tidy Go modules
+    cmds:
+      - go mod tidy
