@@ -16,6 +16,7 @@ tasks:
 
   dev:
     desc: Run Go API with live reload
+    dotenv: ["../../.env"]
     cmds:
       - go tool air
 

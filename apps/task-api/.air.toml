@@ -6,3 +6,4 @@ tmp_dir = "tmp"
   bin = "./tmp/main.exe"
   include_ext = ["go"]
   exclude_dir = ["tmp"]
+  env_files = [".env"]

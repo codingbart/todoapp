@@ -19,8 +19,8 @@ type configLoader struct {
 func NewConfig(log logger.Logger) Config {
 	cl := &configLoader{log: log}
 	return Config{
-		Host: cl.getEnvAsString("HOST", "localhost"),
-		Port: cl.getEnvAsUint("PORT", 8080),
+		Host: cl.getEnvAsString("API_HOST", "localhost"),
+		Port: cl.getEnvAsUint("API_PORT", 8080),
 	}
 }
 
