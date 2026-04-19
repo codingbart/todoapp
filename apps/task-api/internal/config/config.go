@@ -8,8 +8,9 @@ import (
 )
 
 type Config struct {
-	Host string
-	Port uint
+	Host  string
+	Port  uint
+	DBUrl string
 }
 
 type configLoader struct {
@@ -19,8 +20,9 @@ type configLoader struct {
 func NewConfig(log logger.Logger) Config {
 	cl := &configLoader{log: log}
 	return Config{
-		Host: cl.getEnvAsString("API_HOST", "localhost"),
-		Port: cl.getEnvAsUint("API_PORT", 8080),
+		Host:  cl.getEnvAsString("API_HOST", "localhost"),
+		Port:  cl.getEnvAsUint("API_PORT", 8080),
+		DBUrl: cl.getEnvAsString("API_DB_URL", "postgres://todoapp:todoapp@localhost:5432/todoapp?sslmode=disable"),
 	}
 }
 
