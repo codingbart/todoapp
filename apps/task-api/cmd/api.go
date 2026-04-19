@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -17,12 +18,14 @@ type Application interface {
 type app struct {
 	config config.Config
 	logger logger.Logger
+	db     *sql.DB
 }
 
-func NewApplication(config config.Config, logger logger.Logger) Application {
+func NewApplication(config config.Config, logger logger.Logger, db *sql.DB) Application {
 	return &app{
 		config: config,
 		logger: logger,
+		db:     db,
 	}
 }
 
