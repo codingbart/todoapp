@@ -1,7 +1,7 @@
 version: "3"
 
 vars:
-  API_CMD: ./cmd/api
+  API_CMD: ./cmd
 
 tasks:
   default:
