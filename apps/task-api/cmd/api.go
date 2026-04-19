@@ -1,10 +1,12 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 
+	"github.com/codingbart/todoapp/task-api/internal/config"
 	"github.com/codingbart/todoapp/task-api/internal/health"
+	"github.com/codingbart/todoapp/task-api/internal/logger"
 )
 
 type Application interface {
@@ -13,12 +15,14 @@ type Application interface {
 }
 
 type app struct {
-	address string
+	config config.Config
+	logger logger.Logger
 }
 
-func NewApplication(address string) Application {
+func NewApplication(config config.Config, logger logger.Logger) Application {
 	return &app{
-		address: address,
+		config: config,
+		logger: logger,
 	}
 }
 
@@ -33,12 +37,14 @@ func (app *app) Mount() http.Handler {
 }
 
 func (app *app) Run(h http.Handler) error {
+	address := fmt.Sprintf("%s:%d", app.config.Host, app.config.Port)
+
 	server := &http.Server{
-		Addr:    app.address,
+		Addr:    address,
 		Handler: h,
 	}
 
-	log.Printf("server has started at addr %s", app.address)
+	app.logger.Info("server started", "addr", address)
 
 	return server.ListenAndServe()
 }
