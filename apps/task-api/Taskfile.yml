@@ -78,3 +78,8 @@ tasks:
     desc: Generate Go code from SQL queries
     cmds:
       - go tool sqlc generate
+
+  swagger:generate:
+    desc: Generate Swagger docs
+    cmds:
+      - go tool swag init -g ./cmd/main.go -o ./docs
