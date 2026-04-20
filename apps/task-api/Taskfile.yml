@@ -49,3 +49,26 @@ tasks:
     desc: Tidy Go modules
     cmds:
       - go mod tidy
+
+  migrate:up:
+    desc: Run all pending migrations
+    dotenv: ["../../.env"]
+    cmds:
+      - go tool goose -dir ./internal/db/adapters/postgresql/migrations postgres "$API_DB_URL" up
+
+  migrate:down:
+    desc: Rollback last migration
+    dotenv: ["../../.env"]
+    cmds:
+      - go tool goose -dir ./internal/db/adapters/postgresql/migrations postgres "$API_DB_URL" down
+
+  migrate:status:
+    desc: Show migration status
+    dotenv: ["../../.env"]
+    cmds:
+      - go tool goose -dir ./internal/db/adapters/postgresql/migrations postgres "$API_DB_URL" status
+
+  migrate:create:
+    desc: Create new migration
+    cmds:
+      - go tool goose -dir ./internal/db/adapters/postgresql/migrations -s create {{.CLI_ARGS}} sql

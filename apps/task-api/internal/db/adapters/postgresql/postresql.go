@@ -7,7 +7,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-func NewPostgresqlStorage(cfg config.Config) (*sql.DB, error) {
+func NewPostgresqlAdapter(cfg config.Config) (*sql.DB, error) {
 	db, err := sql.Open("pgx", cfg.DBUrl)
 	if err != nil {
 		return nil, err

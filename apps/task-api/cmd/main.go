@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/codingbart/todoapp/task-api/internal/config"
-	"github.com/codingbart/todoapp/task-api/internal/db"
+	db "github.com/codingbart/todoapp/task-api/internal/db/adapters/postgresql"
 	"github.com/codingbart/todoapp/task-api/internal/logger"
 )
 
@@ -12,7 +12,7 @@ func main() {
 	log := logger.NewSlog()
 	cfg := config.NewConfig(log)
 
-	db, err := db.NewPostgresqlStorage(cfg)
+	db, err := db.NewPostgresqlAdapter(cfg)
 	if err != nil {
 		log.Error("failed to connect to database", "err", err)
 		os.Exit(1)
