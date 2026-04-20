@@ -11,6 +11,7 @@ import (
 	"github.com/codingbart/todoapp/task-api/internal/health"
 	"github.com/codingbart/todoapp/task-api/internal/logger"
 	"github.com/codingbart/todoapp/task-api/internal/middleware"
+	"github.com/codingbart/todoapp/task-api/internal/task"
 	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -46,8 +47,22 @@ func (app *app) Mount() http.Handler {
 
 	healthService := health.NewService()
 	healthHandler := health.NewHandler(healthService)
+
+	taskService := task.NewService(app.queries)
+	taskHandler := task.NewHandler(taskService)
+
 	r.Route(app.config.BasePath, func(r chi.Router) {
 		r.With(auth.Protect).Get("/health", healthHandler.GetHealthStatus)
+
+		r.Group(func(r chi.Router) {
+			r.Use(auth.Protect)
+			r.Get("/users/{userId}/tasks", taskHandler.GetAll)
+			r.Post("/users/{userId}/tasks", taskHandler.Create)
+			r.Get("/users/{userId}/tasks/{id}", taskHandler.GetByID)
+			r.Put("/users/{userId}/tasks/{id}", taskHandler.Update)
+			r.Delete("/users/{userId}/tasks/{id}", taskHandler.Delete)
+			r.Get("/users/{userId}/dashboard", taskHandler.GetDashboard)
+		})
 	})
 
 	r.Handle("/swagger/*", app.swaggerHandler())

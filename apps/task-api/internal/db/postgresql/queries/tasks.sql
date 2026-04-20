@@ -22,3 +22,6 @@ SELECT * FROM tasks WHERE user_id = $1 AND priority = $2 ORDER BY created_at DES
 
 -- name: DeleteTaskById :exec
 DELETE FROM tasks WHERE id = $1;
+
+-- name: CountTasksByUserIdGroupedByStatus :many
+SELECT status, COUNT(*) as count FROM tasks WHERE user_id = $1 GROUP BY status;
