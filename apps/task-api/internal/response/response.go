@@ -17,11 +17,8 @@ func Write[T any](w http.ResponseWriter, status int, data T) error {
 	})
 }
 
-func Error(w http.ResponseWriter, status int, code, message string) error {
+func Error(w http.ResponseWriter, status int, message string) error {
 	return writeJSON(w, status, ErrorResponse{
-		Error: ErrorBody{
-			Code:    code,
-			Message: message,
-		},
+		Error: message,
 	})
 }

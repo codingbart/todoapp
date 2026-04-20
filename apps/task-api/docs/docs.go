@@ -41,6 +41,14 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "Keycloak": {
+            "type": "oauth2",
+            "flow": "accessCode",
+            "authorizationUrl": "KEYCLOAK_AUTH_URL",
+            "tokenUrl": "KEYCLOAK_TOKEN_URL"
+        }
     }
 }`
 
@@ -51,7 +59,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Task API",
-	Description:      "",
+	Description:      "REST API dla aplikacji todo",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

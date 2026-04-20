@@ -1,12 +1,7 @@
 package response
 
-type ErrorBody struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
 type ErrorResponse struct {
-	Error ErrorBody `json:"error"`
+	Error string `json:"error"`
 }
 
 type Response[T any] struct {

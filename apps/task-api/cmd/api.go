@@ -1,18 +1,17 @@
-// @title           Task API
-// @version         1.0
-// @description     REST API dla aplikacji todo
-
 package main
 
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
-	_ "github.com/codingbart/todoapp/task-api/docs"
+	"github.com/codingbart/todoapp/task-api/docs"
 	"github.com/codingbart/todoapp/task-api/internal/config"
 	db "github.com/codingbart/todoapp/task-api/internal/db/postgresql"
 	"github.com/codingbart/todoapp/task-api/internal/health"
 	"github.com/codingbart/todoapp/task-api/internal/logger"
+	"github.com/codingbart/todoapp/task-api/internal/middleware"
+	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -36,14 +35,24 @@ func NewApplication(config config.Config, logger logger.Logger, queries *db.Quer
 }
 
 func (app *app) Mount() http.Handler {
-	mux := http.NewServeMux()
+	r := chi.NewRouter()
+
+	app.configureSwagger()
+
+	auth, err := middleware.NewAuthMiddleware(app.config.KeycloakJWKSURL, app.queries)
+	if err != nil {
+		app.logger.Error("failed to create auth middleware", "err", err)
+	}
 
 	healthService := health.NewService()
 	healthHandler := health.NewHandler(healthService)
-	mux.HandleFunc("GET /api/health", healthHandler.GetHealthStatus)
-	mux.HandleFunc("GET /swagger/", httpSwagger.WrapHandler)
+	r.Route(app.config.BasePath, func(r chi.Router) {
+		r.With(auth.Protect).Get("/health", healthHandler.GetHealthStatus)
+	})
 
-	return mux
+	r.Handle("/swagger/*", app.swaggerHandler())
+
+	return r
 }
 
 func (app *app) Run(h http.Handler) error {
@@ -57,4 +66,24 @@ func (app *app) Run(h http.Handler) error {
 	app.logger.Info("server started", "addr", address)
 
 	return server.ListenAndServe()
+}
+
+func (app *app) configureSwagger() {
+	docs.SwaggerInfo.BasePath = app.config.BasePath
+	docs.SwaggerInfo.SwaggerTemplate = strings.NewReplacer(
+		"KEYCLOAK_AUTH_URL", app.config.KeycloakAuthURL,
+		"KEYCLOAK_TOKEN_URL", app.config.KeycloakTokenURL,
+	).Replace(docs.SwaggerInfo.SwaggerTemplate)
+}
+
+func (app *app) swaggerHandler() http.Handler {
+	return httpSwagger.Handler(
+		httpSwagger.PersistAuthorization(true),
+		httpSwagger.AfterScript(
+			fmt.Sprintf(
+				`window.ui.initOAuth({ clientId: %q, usePkceWithAuthorizationCodeGrant: true });`,
+				app.config.KeycloakSwaggerClientID,
+			),
+		),
+	)
 }
