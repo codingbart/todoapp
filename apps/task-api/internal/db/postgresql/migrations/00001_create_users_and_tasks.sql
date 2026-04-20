@@ -4,7 +4,7 @@ CREATE TYPE task_priority AS ENUM ('low', 'medium', 'high');
 
 CREATE TABLE users (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    keycloak_id TEXT NOT NULL UNIQUE,
+    keycloak_id TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE tasks (

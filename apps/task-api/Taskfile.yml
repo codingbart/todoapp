@@ -22,6 +22,7 @@ tasks:
 
   run:
     desc: Run Go API
+    dotenv: ["../../.env"]
     cmds:
       - go run {{.API_CMD}}
 
@@ -54,21 +55,26 @@ tasks:
     desc: Run all pending migrations
     dotenv: ["../../.env"]
     cmds:
-      - go tool goose -dir ./internal/db/adapters/postgresql/migrations postgres "$API_DB_URL" up
+      - go tool goose -dir ./internal/db/postgresql/migrations postgres "$API_DB_URL" up
 
   migrate:down:
     desc: Rollback last migration
     dotenv: ["../../.env"]
     cmds:
-      - go tool goose -dir ./internal/db/adapters/postgresql/migrations postgres "$API_DB_URL" down
+      - go tool goose -dir ./internal/db/postgresql/migrations postgres "$API_DB_URL" down
 
   migrate:status:
     desc: Show migration status
     dotenv: ["../../.env"]
     cmds:
-      - go tool goose -dir ./internal/db/adapters/postgresql/migrations postgres "$API_DB_URL" status
+      - go tool goose -dir ./internal/db/postgresql/migrations postgres "$API_DB_URL" status
 
   migrate:create:
     desc: Create new migration
     cmds:
-      - go tool goose -dir ./internal/db/adapters/postgresql/migrations -s create {{.CLI_ARGS}} sql
+      - go tool goose -dir ./internal/db/postgresql/migrations -s create {{.CLI_ARGS}} sql
+
+  sqlc:generate:
+    desc: Generate Go code from SQL queries
+    cmds:
+      - go tool sqlc generate

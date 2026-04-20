@@ -1,11 +1,11 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 
 	"github.com/codingbart/todoapp/task-api/internal/config"
+	db "github.com/codingbart/todoapp/task-api/internal/db/postgresql"
 	"github.com/codingbart/todoapp/task-api/internal/health"
 	"github.com/codingbart/todoapp/task-api/internal/logger"
 )
@@ -16,16 +16,16 @@ type Application interface {
 }
 
 type app struct {
-	config config.Config
-	logger logger.Logger
-	db     *sql.DB
+	config  config.Config
+	logger  logger.Logger
+	queries *db.Queries
 }
 
-func NewApplication(config config.Config, logger logger.Logger, db *sql.DB) Application {
+func NewApplication(config config.Config, logger logger.Logger, queries *db.Queries) Application {
 	return &app{
-		config: config,
-		logger: logger,
-		db:     db,
+		config:  config,
+		logger:  logger,
+		queries: queries,
 	}
 }
 
