@@ -12,6 +12,38 @@ import (
 	"github.com/google/uuid"
 )
 
+const countTasksByUserIdGroupedByStatus = `-- name: CountTasksByUserIdGroupedByStatus :many
+SELECT status, COUNT(*) as count FROM tasks WHERE user_id = $1 GROUP BY status
+`
+
+type CountTasksByUserIdGroupedByStatusRow struct {
+	Status TaskStatus `json:"status"`
+	Count  int64      `json:"count"`
+}
+
+func (q *Queries) CountTasksByUserIdGroupedByStatus(ctx context.Context, userID uuid.UUID) ([]CountTasksByUserIdGroupedByStatusRow, error) {
+	rows, err := q.db.QueryContext(ctx, countTasksByUserIdGroupedByStatus, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CountTasksByUserIdGroupedByStatusRow
+	for rows.Next() {
+		var i CountTasksByUserIdGroupedByStatusRow
+		if err := rows.Scan(&i.Status, &i.Count); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const createTask = `-- name: CreateTask :one
 INSERT INTO tasks (user_id, title, description, status, priority, due_date)
 VALUES ($1, $2, $3, $4, $5, $6)
