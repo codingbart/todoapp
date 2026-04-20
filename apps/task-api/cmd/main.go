@@ -1,5 +1,10 @@
 // @title           Task API
 // @version         1.0
+// @description     REST API dla aplikacji todo
+//
+// @securityDefinitions.oauth2.accessCode Keycloak
+// @authorizationUrl KEYCLOAK_AUTH_URL
+// @tokenUrl KEYCLOAK_TOKEN_URL
 
 package main
 

@@ -1,6 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
+        "description": "REST API dla aplikacji todo",
         "title": "Task API",
         "contact": {},
         "version": "1.0"
@@ -31,6 +32,14 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "Keycloak": {
+            "type": "oauth2",
+            "flow": "accessCode",
+            "authorizationUrl": "KEYCLOAK_AUTH_URL",
+            "tokenUrl": "KEYCLOAK_TOKEN_URL"
         }
     }
 }

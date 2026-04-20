@@ -19,6 +19,20 @@
       "protocol": "openid-connect"
     },
     {
+      "clientId": "swagger-ui",
+      "name": "Swagger UI",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:3000/swagger/*"],
+      "webOrigins": ["http://localhost:3000"],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
       "clientId": "task-api",
       "enabled": true,
       "publicClient": false,
@@ -39,6 +53,8 @@
     {
       "username": "user@example.com",
       "email": "user@example.com",
+      "firstName": "Example",
+      "lastName": "User",
       "enabled": true,
       "emailVerified": true,
       "credentials": [

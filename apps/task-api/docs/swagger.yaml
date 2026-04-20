@@ -6,6 +6,7 @@ definitions:
     type: object
 info:
   contact: {}
+  description: REST API dla aplikacji todo
   title: Task API
   version: "1.0"
 paths:
@@ -19,4 +20,10 @@ paths:
       summary: Health check
       tags:
       - health
+securityDefinitions:
+  Keycloak:
+    authorizationUrl: KEYCLOAK_AUTH_URL
+    flow: accessCode
+    tokenUrl: KEYCLOAK_TOKEN_URL
+    type: oauth2
 swagger: "2.0"

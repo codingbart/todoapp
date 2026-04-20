@@ -11,19 +11,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const createUser = `-- name: CreateUser :one
-INSERT INTO users (keycloak_id)
-VALUES ($1)
-RETURNING id, keycloak_id
-`
-
-func (q *Queries) CreateUser(ctx context.Context, keycloakID string) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, keycloakID)
-	var i User
-	err := row.Scan(&i.ID, &i.KeycloakID)
-	return i, err
-}
-
 const deleteUserById = `-- name: DeleteUserById :exec
 DELETE FROM users WHERE id = $1
 `
@@ -34,12 +21,63 @@ func (q *Queries) DeleteUserById(ctx context.Context, id uuid.UUID) error {
 }
 
 const findUserById = `-- name: FindUserById :one
-SELECT id, keycloak_id FROM users WHERE id = $1
+SELECT id, keycloak_id, name, email, created_at, updated_at FROM users WHERE id = $1
 `
 
 func (q *Queries) FindUserById(ctx context.Context, id uuid.UUID) (User, error) {
 	row := q.db.QueryRowContext(ctx, findUserById, id)
 	var i User
-	err := row.Scan(&i.ID, &i.KeycloakID)
+	err := row.Scan(
+		&i.ID,
+		&i.KeycloakID,
+		&i.Name,
+		&i.Email,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const findUserByKeycloakId = `-- name: FindUserByKeycloakId :one
+SELECT id, keycloak_id, name, email, created_at, updated_at FROM users WHERE keycloak_id = $1
+`
+
+func (q *Queries) FindUserByKeycloakId(ctx context.Context, keycloakID string) (User, error) {
+	row := q.db.QueryRowContext(ctx, findUserByKeycloakId, keycloakID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.KeycloakID,
+		&i.Name,
+		&i.Email,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const saveUser = `-- name: SaveUser :one
+INSERT INTO users (keycloak_id, name, email)
+VALUES ($1, $2, $3)
+RETURNING id, keycloak_id, name, email, created_at, updated_at
+`
+
+type SaveUserParams struct {
+	KeycloakID string `json:"keycloak_id"`
+	Name       string `json:"name"`
+	Email      string `json:"email"`
+}
+
+func (q *Queries) SaveUser(ctx context.Context, arg SaveUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, saveUser, arg.KeycloakID, arg.Name, arg.Email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.KeycloakID,
+		&i.Name,
+		&i.Email,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
 	return i, err
 }
