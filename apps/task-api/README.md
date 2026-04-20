@@ -1,37 +1,60 @@
 # task-api
 
+Go REST API for the todo application.
+
 ## Requirements
 
-- [Go](https://go.dev/) in a version compatible with `go.mod`
+- [Go 1.26+](https://go.dev/dl/)
+- [Task](https://taskfile.dev/installation/) - task runner
 
-## Taskfile
+## Quick start
 
-The project uses [Taskfile](https://taskfile.dev/) for the most common commands.
+### 1. Environment variables
 
-List available tasks:
+Copy `.env.example` in the **project root**:
 
 ```bash
-task
+cp .env.example .env
 ```
 
-## Development
+### 2. Start infrastructure
 
-Install development tools first:
+From the **project root**:
 
 ```bash
+docker compose up -d
+```
+
+### 3. Install tools
+
+```bash12
 task tools
 ```
 
-Then run the app with live reload:
+### 4. Run migrations
 
+```bash
+task migrate:up
+```
+
+### 5. Start the API
+
+With live reload:
 ```bash
 task dev
 ```
 
-## Running
-
-Run the app without live reload:
-
+Without live reload:
 ```bash
 task run
 ```
+
+API available at `http://localhost:3000/api`
+
+## Swagger UI
+
+`http://localhost:3000/swagger`
+
+Authorization via Keycloak (PKCE):
+- client: `swagger-ui`
+- test user: `user@example.com` / `user`
