@@ -1,13 +1,19 @@
+// @title           Task API
+// @version         1.0
+// @description     REST API dla aplikacji todo
+
 package main
 
 import (
 	"fmt"
 	"net/http"
 
+	_ "github.com/codingbart/todoapp/task-api/docs"
 	"github.com/codingbart/todoapp/task-api/internal/config"
 	db "github.com/codingbart/todoapp/task-api/internal/db/postgresql"
 	"github.com/codingbart/todoapp/task-api/internal/health"
 	"github.com/codingbart/todoapp/task-api/internal/logger"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Application interface {
@@ -35,6 +41,7 @@ func (app *app) Mount() http.Handler {
 	healthService := health.NewService()
 	healthHandler := health.NewHandler(healthService)
 	mux.HandleFunc("GET /api/health", healthHandler.GetHealthStatus)
+	mux.HandleFunc("GET /swagger/", httpSwagger.WrapHandler)
 
 	return mux
 }
