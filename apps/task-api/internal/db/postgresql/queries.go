@@ -1,4 +1,4 @@
-package db
+package postgresql
 
 import (
 	"database/sql"
@@ -7,11 +7,11 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-func NewPostgresqlAdapter(cfg config.Config) (*sql.DB, error) {
+func NewPostgresqlQueries(cfg config.Config) (*Queries, error) {
 	db, err := sql.Open("pgx", cfg.DBUrl)
 	if err != nil {
 		return nil, err
 	}
 
-	return db, nil
+	return New(db), nil
 }
