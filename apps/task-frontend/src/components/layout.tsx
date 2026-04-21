@@ -1,23 +1,17 @@
 import { Outlet } from 'react-router-dom';
 
-import { AppSidebar } from '@/components/app-sidebar';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { Separator } from '@/components/ui/separator';
+import { ProfileMenu } from '@/components/profile-menu';
 
 export function Layout() {
     return (
-        <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-                <header className='flex h-14 shrink-0 items-center gap-2 border-b px-4'>
-                    <SidebarTrigger className='-ml-1' />
-                    <Separator orientation='vertical' className='h-4' />
-                    <span className='text-muted-foreground text-sm'>TodoApp</span>
-                </header>
-                <main className='flex flex-1 flex-col gap-4 p-4'>
-                    <Outlet />
-                </main>
-            </SidebarInset>
-        </SidebarProvider>
+        <div className='flex min-h-screen flex-col'>
+            <header className='flex h-14 shrink-0 items-center justify-between border-b px-6'>
+                <span className='font-semibold'>TodoApp</span>
+                <ProfileMenu />
+            </header>
+            <main className='mx-auto w-full max-w-4xl flex-1 p-6'>
+                <Outlet />
+            </main>
+        </div>
     );
 }
