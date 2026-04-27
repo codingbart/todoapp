@@ -22,12 +22,14 @@ func NewHandler(service Service) *Handler {
 // @Router /users/{userId}/tasks [get]
 // @Tags tasks
 // @Summary List all tasks for a user
-// @Security OAuth2
+// @Security Keycloak
 // @Param userId path string true "User ID"
 // @Param status query string false "Filter by status (todo, in_progress, done)"
 // @Param priority query string false "Filter by priority (low, medium, high)"
-// @Success 200 {object} response.Response[[]TaskResponse]
+// @Success 200 {object} TaskListResponse
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 401 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(chi.URLParam(r, "userId"))
 	if err != nil {
@@ -38,6 +40,10 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	filters := TaskFilters{
 		Status:   r.URL.Query().Get("status"),
 		Priority: r.URL.Query().Get("priority"),
+	}
+	if err := filters.Validate(); err != nil {
+		response.Error(w, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	tasks, err := h.service.GetAll(r.Context(), userID, filters)
@@ -52,10 +58,12 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Router /users/{userId}/dashboard [get]
 // @Tags dashboard
 // @Summary Get task summary dashboard for a user
-// @Security OAuth2
+// @Security Keycloak
 // @Param userId path string true "User ID"
-// @Success 200 {object} response.Response[DashboardResponse]
+// @Success 200 {object} DashboardSingleResponse
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 401 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
 func (h *Handler) GetDashboard(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(chi.URLParam(r, "userId"))
 	if err != nil {
@@ -75,11 +83,14 @@ func (h *Handler) GetDashboard(w http.ResponseWriter, r *http.Request) {
 // @Router /users/{userId}/tasks/{id} [get]
 // @Tags tasks
 // @Summary Get a task by ID
-// @Security OAuth2
+// @Security Keycloak
 // @Param userId path string true "User ID"
 // @Param id path string true "Task ID"
-// @Success 200 {object} response.Response[TaskResponse]
+// @Success 200 {object} TaskSingleResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 401 {object} response.ErrorResponse
 // @Failure 404 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
 func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -103,11 +114,13 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 // @Router /users/{userId}/tasks [post]
 // @Tags tasks
 // @Summary Create a new task
-// @Security OAuth2
+// @Security Keycloak
 // @Param userId path string true "User ID"
 // @Param body body CreateTaskRequest true "Task data"
-// @Success 201 {object} response.Response[TaskResponse]
+// @Success 201 {object} TaskSingleResponse
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 401 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(chi.URLParam(r, "userId"))
 	if err != nil {
@@ -121,8 +134,8 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Title == "" {
-		response.Error(w, http.StatusBadRequest, "Title is required")
+	if err := req.Validate(); err != nil {
+		response.Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -138,13 +151,15 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // @Router /users/{userId}/tasks/{id} [put]
 // @Tags tasks
 // @Summary Update a task
-// @Security OAuth2
+// @Security Keycloak
 // @Param userId path string true "User ID"
 // @Param id path string true "Task ID"
 // @Param body body UpdateTaskRequest true "Task data"
-// @Success 200 {object} response.Response[TaskResponse]
+// @Success 200 {object} TaskSingleResponse
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 401 {object} response.ErrorResponse
 // @Failure 404 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -158,8 +173,8 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Title == "" {
-		response.Error(w, http.StatusBadRequest, "Title is required")
+	if err := req.Validate(); err != nil {
+		response.Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -179,11 +194,14 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 // @Router /users/{userId}/tasks/{id} [delete]
 // @Tags tasks
 // @Summary Delete a task
-// @Security OAuth2
+// @Security Keycloak
 // @Param userId path string true "User ID"
 // @Param id path string true "Task ID"
 // @Success 204
 // @Failure 400 {object} response.ErrorResponse
+// @Failure 401 {object} response.ErrorResponse
+// @Failure 404 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -192,6 +210,10 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.service.Delete(r.Context(), id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			response.Error(w, http.StatusNotFound, "Task not found")
+			return
+		}
 		response.Error(w, http.StatusInternalServerError, "Failed to delete task")
 		return
 	}

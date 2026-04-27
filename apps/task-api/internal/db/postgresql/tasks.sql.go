@@ -83,13 +83,16 @@ func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) (Task, e
 	return i, err
 }
 
-const deleteTaskById = `-- name: DeleteTaskById :exec
+const deleteTaskById = `-- name: DeleteTaskById :execrows
 DELETE FROM tasks WHERE id = $1
 `
 
-func (q *Queries) DeleteTaskById(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.ExecContext(ctx, deleteTaskById, id)
-	return err
+func (q *Queries) DeleteTaskById(ctx context.Context, id uuid.UUID) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteTaskById, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const findAllTasksByUserId = `-- name: FindAllTasksByUserId :many
