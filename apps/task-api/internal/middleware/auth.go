@@ -60,7 +60,7 @@ func (m *AuthMiddleware) Protect(next http.Handler) http.Handler {
 
 		user, err := m.syncUser(r.Context(), uc)
 		if err != nil {
-			response.Error(w, http.StatusUnauthorized, "Unauthorized")
+			response.Error(w, http.StatusInternalServerError, "Failed to sync user")
 			return
 		}
 

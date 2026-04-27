@@ -19,6 +19,7 @@ func NewHandler(service Service) *handler {
 // @Router /health [get]
 // @Tags health
 // @Summary Health check
+// @Security Keycloak
 // @Success 200 {object} HealthResponse
 func (h *handler) GetHealthStatus(w http.ResponseWriter, r *http.Request) {
 	status := h.service.GetHealthStatus()

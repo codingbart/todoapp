@@ -155,7 +155,14 @@ func (s *service) Update(ctx context.Context, id uuid.UUID, req UpdateTaskReques
 }
 
 func (s *service) Delete(ctx context.Context, id uuid.UUID) error {
-	return s.queries.DeleteTaskById(ctx, id)
+	rows, err := s.queries.DeleteTaskById(ctx, id)
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
 }
 
 func toTaskResponse(t db.Task) TaskResponse {

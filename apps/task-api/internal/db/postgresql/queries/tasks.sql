@@ -20,7 +20,7 @@ SELECT * FROM tasks WHERE user_id = $1 AND status = $2 ORDER BY created_at DESC;
 -- name: FindAllTasksByUserIdAndPriority :many
 SELECT * FROM tasks WHERE user_id = $1 AND priority = $2 ORDER BY created_at DESC;
 
--- name: DeleteTaskById :exec
+-- name: DeleteTaskById :execrows
 DELETE FROM tasks WHERE id = $1;
 
 -- name: CountTasksByUserIdGroupedByStatus :many
