@@ -1,14 +1,28 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { type Task } from '@/types/task';
+import { useAppDispatch } from '@/hooks/use-app-dispatch';
+import { useAppSelector } from '@/hooks/use-app-selector';
+import { selectAllTasks, selectTasksStatus } from '@/state/tasks/selectors';
+import { createTask, deleteTask, fetchTasks } from '@/state/tasks/thunks';
 
 export function useTasks() {
-    const [tasks, setTasks] = useState<Task[]>([]);
+    const userId = '123'; // TODO: get user id - useAuth() or etc.
+    const tasks = useAppSelector(selectAllTasks);
+    const status = useAppSelector(selectTasksStatus);
+    const dispatch = useAppDispatch();
 
-    const addTask = (task: Task) => setTasks(prev => [task, ...prev]);
+    useEffect(() => {
+        dispatch(fetchTasks(userId));
+    }, [dispatch, userId]);
 
-    const deleteTask = (id: string) => setTasks(prev => prev.filter(t => t.id !== id));
+    const countTasksByStatus = (status: Task['status']) =>
+        tasks.filter(t => t.status === status).length;
 
-    const countByStatus = (status: Task['status']) => tasks.filter(t => t.status === status).length;
-
-    return { tasks, addTask, deleteTask, countByStatus };
+    return {
+        tasks,
+        status,
+        addTask: (task: Task) => dispatch(createTask(task)),
+        deleteTask: (id: string) => dispatch(deleteTask(id)),
+        countTasksByStatus
+    };
 }

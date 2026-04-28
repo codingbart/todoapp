@@ -7,15 +7,19 @@ import { TaskItem } from '@/components/task-item';
 import { Button } from '@/components/ui/button';
 
 export function TasksPage() {
-    const { tasks, addTask, deleteTask, countByStatus } = useTasks();
+    const { tasks, addTask, deleteTask, countTasksByStatus } = useTasks();
     const [dialogOpen, setDialogOpen] = useState(false);
 
     return (
         <div className='space-y-6'>
             <div className='grid grid-cols-3 gap-4'>
-                <StatCard label='Do zrobienia' value={countByStatus('TODO')} />
-                <StatCard label='W toku' value={countByStatus('IN_PROGRESS')} variant='warning' />
-                <StatCard label='Ukończone' value={countByStatus('DONE')} variant='success' />
+                <StatCard label='Do zrobienia' value={countTasksByStatus('TODO')} />
+                <StatCard
+                    label='W toku'
+                    value={countTasksByStatus('IN_PROGRESS')}
+                    variant='warning'
+                />
+                <StatCard label='Ukończone' value={countTasksByStatus('DONE')} variant='success' />
             </div>
             <div className='space-y-4'>
                 <div className='flex items-center justify-between'>
