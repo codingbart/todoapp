@@ -66,14 +66,101 @@
 % ============================================================
 \section{Wprowadzenie}
 
-Niniejszy dokument jest \textbf{uzupełnieniem} raportu z~kamienia milowego~I i~koncentruje się wyłącznie na elementach wymaganych w~drugim etapie: stanie implementacji, diagramie sekwencji, diagramie aktywności oraz aktualizacjach wcześniej przygotowanych diagramów. Pozostałe sekcje (cel i~zakres systemu, aktorzy, wymagania funkcjonalne i~niefunkcjonalne, słownik pojęć, pełen stos technologiczny) nie są tu powtarzane -- pozostają one w~dokumencie KM~I.
+Niniejszy dokument stanowi \textbf{kontynuację i~rozwinięcie} raportu z~kamienia milowego~I. Przedstawia on aktualny stan systemu po fazie implementacji, a~także zawiera wszystkie sekcje analityczne z~KM~I -- zaktualizowane zgodnie z~rzeczywistą realizacją projektu. Dodatkowo wprowadzono dwa nowe diagramy wymagane w~drugim etapie: diagram sekwencji oraz diagram aktywności.
 
 W~stosunku do KM~I nastąpiła jedna istotna zmiana stosu technologicznego: zaplanowany Spring Boot (Java) po stronie backendu został zastąpiony przez \textbf{Go} (router \texttt{chi}, generator \texttt{sqlc}). Decyzja była motywowana chęcią wypróbowania języka Go w~praktyce. Pozostałe elementy stosu (frontend React, Keycloak, PostgreSQL, Docker) pozostały bez zmian.
 
 % ============================================================
-% 2. STAN IMPLEMENTACJI
+% 2. CEL I ZAKRES SYSTEMU
 % ============================================================
-\section{Stan implementacji}
+\section{Cel i~zakres systemu}
+
+\subsection{Cel}
+Celem systemu jest umożliwienie użytkownikom efektywnego zarządzania zadaniami osobistymi i~zespołowymi poprzez intuicyjny interfejs webowy. System pozwala na tworzenie, edycję, śledzenie postępu oraz organizację zadań z~uwzględnieniem priorytetów i~terminów realizacji.
+
+\subsection{Zakres}
+System obejmuje:
+\begin{itemize}
+  \item rejestrację i~uwierzytelnianie użytkowników (z~wykorzystaniem serwisu Keycloak),
+  \item zarządzanie zadaniami: tworzenie z~tytułem, opisem, priorytetem i~terminem realizacji, edycja oraz usuwanie,
+  \item kategoryzację zadań według statusu (Do zrobienia, W~trakcie, Zrobione) i~priorytetu (Niski, Średni, Wysoki),
+  \item widok listy zadań z~możliwością filtrowania,
+  \item panel główny (dashboard) z~podsumowaniem statystyk zadań.
+\end{itemize}
+
+% ============================================================
+% 3. AKTORZY SYSTEMU
+% ============================================================
+\section{Aktorzy systemu}
+
+\begin{itemize}
+  \item \textbf{Użytkownik} -- osoba korzystająca z~systemu, która może się zalogować, zarejestrować oraz tworzyć, edytować, przeglądać i~usuwać zadania.
+  \item \textbf{Keycloak} -- system zewnętrzny odpowiedzialny za uwierzytelnianie i~autoryzację użytkowników (dostawca tokenów JWT).
+\end{itemize}
+
+% ============================================================
+% 4. WYMAGANIA FUNKCJONALNE
+% ============================================================
+\section{Wymagania funkcjonalne}
+
+\begin{itemize}
+  \item Uwierzytelnianie i~autoryzacja użytkowników poprzez serwis Keycloak (rejestracja, logowanie, wylogowanie).
+  \item Zarządzanie zadaniami: tworzenie z~tytułem, opisem, priorytetem i~terminem realizacji, edycja oraz usuwanie.
+  \item Wyświetlanie listy wszystkich zadań użytkownika.
+  \item Zmiana statusu zadania.
+  \item Przypisanie priorytetu do zadania.
+  \item Wyświetlanie panelu dashboard z~podsumowaniem liczby zadań w~poszczególnych statusach.
+\end{itemize}
+
+Wszystkie powyższe wymagania zostały zaimplementowane w~ramach drugiego kamienia milowego (szczegóły w~sekcji~\ref{sec:stan-impl}).
+
+% ============================================================
+% 5. WYMAGANIA NIEFUNKCJONALNE
+% ============================================================
+\section{Wymagania niefunkcjonalne}
+
+\begin{itemize}
+  \item Interfejs użytkownika musi być responsywny (desktop, tablet, mobile).
+  \item Uwierzytelnianie musi być realizowane przez zewnętrzny serwer Keycloak -- hasła użytkowników nie są przechowywane bezpośrednio w~systemie.
+  \item System powinien być łatwo wdrażalny za pomocą kontenerów Docker.
+  \item Kod źródłowy musi być wersjonowany w~repozytorium Git.
+\end{itemize}
+
+% ============================================================
+% 6. STOS TECHNOLOGICZNY
+% ============================================================
+\section{Stos technologiczny}
+
+\begin{itemize}
+  \item \textbf{Frontend:} React 19, TypeScript, Vite 8, Tailwind CSS v4, shadcn/ui, React Router v7, Redux Toolkit, react-redux.
+  \item \textbf{Backend:} Go (router \texttt{chi}, generator zapytań \texttt{sqlc}, migracje \texttt{goose}, logger \texttt{slog}, dokumentacja \texttt{swaggo}).
+  \item \textbf{Baza danych:} PostgreSQL 16.
+  \item \textbf{Uwierzytelnianie:} Keycloak 26.2 (OAuth2 / OpenID Connect, PKCE, JWKS).
+  \item \textbf{Konteneryzacja:} Docker, Docker Compose.
+  \item \textbf{Środowisko deweloperskie:} Nix flake (\texttt{flake.nix}) oraz \texttt{Taskfile.yml}.
+  \item \textbf{Kontrola wersji:} Git.
+\end{itemize}
+
+% ============================================================
+% 7. SŁOWNIK POJĘĆ
+% ============================================================
+\section{Słownik pojęć}
+
+\begin{itemize}
+  \item \textbf{Zadanie (Task)} -- główna encja systemu, z~którą użytkownik prowadzi interakcje; posiada tytuł, opis, status, priorytet i~termin realizacji.
+  \item \textbf{Status} -- stan realizacji zadania: Do zrobienia, W~trakcie, Zrobione.
+  \item \textbf{Priorytet} -- poziom ważności zadania: Niski, Średni, Wysoki.
+  \item \textbf{Dashboard} -- panel główny z~podsumowaniem statystyk zadań użytkownika.
+  \item \textbf{JWT (JSON Web Token)} -- token używany do przekazywania informacji o~tożsamości i~uprawnieniach użytkownika między frontendem a~backendem.
+  \item \textbf{JWKS (JSON Web Key Set)} -- zbiór publicznych kluczy serwera Keycloak udostępniany pod ścieżką \texttt{/protocol/openid-connect/certs}; używany do weryfikacji podpisów JWT.
+  \item \textbf{sqlc} -- generator kodu Go produkujący statycznie typowane funkcje na podstawie zapytań SQL.
+  \item \textbf{Migracja} -- numerowany skrypt SQL stosowany przy uruchomieniu aplikacji w~celu doprowadzenia schematu bazy do oczekiwanego stanu.
+\end{itemize}
+
+% ============================================================
+% 8. STAN IMPLEMENTACJI
+% ============================================================
+\section{Stan implementacji}\label{sec:stan-impl}
 
 \subsection{Struktura repozytorium}
 Projekt zorganizowany jest jako monorepo zawierające dwie aplikacje:
@@ -85,7 +172,7 @@ oraz konfigurację infrastruktury (\texttt{docker-compose.yml}, \texttt{docker/k
 
 \subsection{Szczegóły implementacyjne}
 
-Poniżej zebrano elementy implementacyjne uzupełniające wymagania funkcjonalne z~KM~I:
+Poniżej zebrano elementy implementacyjne uzupełniające wymagania funkcjonalne:
 \begin{itemize}
   \item \textbf{AuthMiddleware (chi)} -- weryfikuje JWT w~oparciu o~klucze publiczne pobierane z~JWKS Keycloaka; przy pierwszym żądaniu nowego użytkownika automatycznie tworzy wpis w~tabeli \texttt{users} na podstawie pól \texttt{sub}, \texttt{name}, \texttt{email} z~tokenu.
   \item \textbf{Walidacja DTO} -- metody \texttt{Validate()} na strukturach żądania kontrolują obecność tytułu, dopuszczalne wartości statusu/priorytetu oraz format daty (\texttt{YYYY-MM-DD}).
@@ -120,14 +207,11 @@ GET    & /users/\{userId\}/dashboard          & Statystyki zadań użytkownika &
 Migracje (\texttt{goose}) tworzą tabele \texttt{users} oraz \texttt{tasks}, a~także typy wyliczeniowe \texttt{task\_status} (\texttt{todo}, \texttt{in\_progress}, \texttt{done}) i~\texttt{task\_priority} (\texttt{low}, \texttt{medium}, \texttt{high}). Tabela \texttt{tasks} posiada klucz obcy \texttt{user\_id} z~kaskadowym usuwaniem oraz znaczniki czasowe \texttt{created\_at}, \texttt{updated\_at}.
 
 % ============================================================
-% 3. ZAKTUALIZOWANE DIAGRAMY Z KAMIENIA I
+% 9. DIAGRAM PRZYPADKÓW UŻYCIA
 % ============================================================
-\section{Zaktualizowane diagramy z~kamienia I}
+\section{Diagram przypadków użycia}
 
-Wszystkie diagramy zostały dostosowane do rzeczywistej implementacji.
-
-\subsection{Diagram przypadków użycia}
-Diagram został otoczony granicą systemu \emph{Aplikacja Todo}. \emph{Użytkownik} -- jako bezpośredni odbiorca aplikacji -- został umieszczony wewnątrz granicy, natomiast \emph{Keycloak} jako zewnętrzny dostawca uwierzytelniania pozostaje poza nią. Dodano przypadek \emph{Synchronizuj profil użytkownika} (\texttt{<<include>>} w~\emph{Zaloguj się}) odpowiadający faktycznemu mechanizmowi tworzenia rekordu w~tabeli \texttt{users} przy pierwszym żądaniu autoryzowanym.
+W~stosunku do KM~I diagram został otoczony granicą systemu \emph{Aplikacja Todo}. \emph{Użytkownik} -- jako bezpośredni odbiorca aplikacji -- został umieszczony wewnątrz granicy, natomiast \emph{Keycloak} jako zewnętrzny dostawca uwierzytelniania pozostaje poza nią. Dodano przypadek \emph{Synchronizuj profil użytkownika} (\texttt{<<include>>} w~\emph{Zaloguj się}) odpowiadający faktycznemu mechanizmowi tworzenia rekordu w~tabeli \texttt{users} przy pierwszym żądaniu autoryzowanym.
 
 \begin{figure}[H]
   \centering
@@ -135,7 +219,11 @@ Diagram został otoczony granicą systemu \emph{Aplikacja Todo}. \emph{Użytkown
   \caption{Diagram przypadków użycia}
 \end{figure}
 
-\subsection{Diagram klas}
+% ============================================================
+% 10. DIAGRAM KLAS
+% ============================================================
+\section{Diagram klas}
+
 Klasa \texttt{User} została rozszerzona o~pola \texttt{name}, \texttt{email}, \texttt{createdAt}, \texttt{updatedAt}, zgodnie z~migracją \texttt{00002\_add\_user\_profile\_columns.sql}. Klasa \texttt{Task} otrzymała pole \texttt{userId} (klucz obcy). Wartości typów wyliczeniowych dostosowano do nazw rzeczywistych (\texttt{todo}, \texttt{in\_progress}, \texttt{done}; \texttt{low}, \texttt{medium}, \texttt{high}). Dodano klasy pomocnicze \texttt{TaskFilters} oraz \texttt{DashboardSummary} odpowiadające DTO obecnym w~kodzie.
 
 \begin{figure}[H]
@@ -144,7 +232,13 @@ Klasa \texttt{User} została rozszerzona o~pola \texttt{name}, \texttt{email}, \
   \caption{Diagram klas (model dziedziny + DTO)}
 \end{figure}
 
-\subsection{Diagram komponentów}
+Relacja: jeden użytkownik posiada wiele zadań (1 do 0..*).
+
+% ============================================================
+% 11. DIAGRAM KOMPONENTÓW
+% ============================================================
+\section{Diagram komponentów}
+
 Diagram odzwierciedla rzeczywiste pakiety: po stronie frontendu wyodrębniono Redux Store (slice, thunki, selektory) oraz konkretne komponenty UI (\texttt{Layout}, \texttt{TaskDialog}, \texttt{TaskItem}, \texttt{StatCard}, \texttt{ProfileMenu}). Po stronie backendu przedstawiono router \texttt{chi}, \texttt{AuthMiddleware} z~weryfikacją JWKS, handlery \texttt{TaskHandler} i~\texttt{HealthHandler}, warstwę serwisów oraz wygenerowane przez \texttt{sqlc} \texttt{Queries}. Endpoint Swagger UI został wskazany jako osobny komponent.
 
 \begin{figure}[H]
@@ -153,7 +247,13 @@ Diagram odzwierciedla rzeczywiste pakiety: po stronie frontendu wyodrębniono Re
   \caption{Diagram komponentów}
 \end{figure}
 
-\subsection{Diagram warstw systemu}
+Komunikacja między frontendem a~backendem odbywa się przez REST API pod ścieżkami \texttt{/api/users/\{id\}/tasks} oraz \texttt{/api/users/\{id\}/dashboard}.
+
+% ============================================================
+% 12. DIAGRAM WARSTW SYSTEMU
+% ============================================================
+\section{Diagram warstw systemu}
+
 Etykiety warstw zaktualizowano zgodnie z~zaimplementowanymi technologiami: warstwa prezentacji opisuje stack React 19 + Redux Toolkit, warstwa API -- chi i~Swagger UI, warstwa logiki -- handlery i~serwisy, warstwa dostępu do danych -- generowane przez \texttt{sqlc} zapytania, a~warstwa bezpieczeństwa -- middleware weryfikujący JWT.
 
 \begin{figure}[H]
@@ -162,8 +262,19 @@ Etykiety warstw zaktualizowano zgodnie z~zaimplementowanymi technologiami: warst
   \caption{Diagram warstw systemu}
 \end{figure}
 
+Architektura systemu oparta jest na modelu warstwowym:
+\begin{enumerate}
+  \item \textbf{Warstwa prezentacji} -- aplikacja React SPA z~Tailwind CSS, React Router oraz gotowymi komponentami shadcn/ui.
+  \item \textbf{Warstwa API} -- komunikacja REST (HTTP/JSON) między frontendem a~backendem.
+  \item \textbf{Warstwa logiki biznesowej} -- handlery, serwisy oraz reguły walidacji.
+  \item \textbf{Warstwa dostępu do danych} -- zapytania generowane przez \texttt{sqlc}.
+  \item \textbf{Warstwa danych} -- relacyjna baza danych PostgreSQL.
+\end{enumerate}
+
+Warstwa bezpieczeństwa (Keycloak, tokeny JWT) jest warstwą przekrojową, przenikającą zarówno warstwę prezentacji (ochrona tras), jak i~warstwę logiki biznesowej (autoryzacja żądań).
+
 % ============================================================
-% 5. DIAGRAM SEKWENCJI
+% 13. DIAGRAM SEKWENCJI
 % ============================================================
 \section{Diagram sekwencji -- utworzenie zadania}
 
@@ -187,7 +298,7 @@ Etykiety warstw zaktualizowano zgodnie z~zaimplementowanymi technologiami: warst
 \end{enumerate}
 
 % ============================================================
-% 6. DIAGRAM AKTYWNOŚCI
+% 14. DIAGRAM AKTYWNOŚCI
 % ============================================================
 \section{Diagram aktywności -- zarządzanie zadaniem}
 
@@ -203,7 +314,7 @@ Etykiety warstw zaktualizowano zgodnie z~zaimplementowanymi technologiami: warst
 Diagram wyodrębnia odpowiedzialności komponentów: \emph{Użytkownik}, \emph{Frontend (React + Redux)}, \emph{Backend (chi router)}, \emph{AuthMiddleware}, \emph{TaskHandler}, \emph{TaskService} oraz \emph{PostgreSQL}.
 
 % ============================================================
-% 7. URUCHAMIANIE I WERYFIKACJA
+% 15. URUCHAMIANIE I WERYFIKACJA
 % ============================================================
 \section{Uruchamianie i~weryfikacja}
 
@@ -229,7 +340,7 @@ Po starcie systemu dostępne są:
 \end{itemize}
 
 % ============================================================
-% 8. PODSUMOWANIE
+% 16. PODSUMOWANIE
 % ============================================================
 \section{Podsumowanie}
 
