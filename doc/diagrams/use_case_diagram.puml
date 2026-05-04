@@ -1,23 +1,34 @@
 @startuml
 left to right direction
 skinparam actorStyle awesome
+skinparam packageStyle rectangle
 
-actor "Użytkownik" as User
 actor "Keycloak" as KC
 
-usecase "Zaloguj się" as UC1
-usecase "Zarejestruj się" as UC2
-usecase "Wyloguj się" as UC3
-usecase "Utwórz zadanie" as UC4
-usecase "Edytuj zadanie" as UC5
-usecase "Usuń zadanie" as UC6
-usecase "Wyświetl listę zadań" as UC7
-usecase "Filtruj listę zadań\n(status, priorytet)" as UC8
-usecase "Wyświetl dashboard" as UC11
-usecase "Wyświetl szczegóły zadania" as UC12
-usecase "Zmień status zadania" as UC13
-usecase "Ustaw priorytet zadania" as UC14
-usecase "Synchronizuj profil\nużytkownika" as UC15
+rectangle "Aplikacja Todo" {
+    actor "Użytkownik" as User
+
+    usecase "Zaloguj się" as UC1
+    usecase "Zarejestruj się" as UC2
+    usecase "Wyloguj się" as UC3
+    usecase "Utwórz zadanie" as UC4
+    usecase "Edytuj zadanie" as UC5
+    usecase "Usuń zadanie" as UC6
+    usecase "Wyświetl listę zadań" as UC7
+    usecase "Filtruj listę zadań\n(status, priorytet)" as UC8
+    usecase "Wyświetl dashboard" as UC11
+    usecase "Wyświetl szczegóły zadania" as UC12
+    usecase "Zmień status zadania" as UC13
+    usecase "Ustaw priorytet zadania" as UC14
+    usecase "Synchronizuj profil\nużytkownika" as UC15
+
+    UC4 ..> UC14 : <<include>>
+    UC5 ..> UC14 : <<include>>
+    UC5 ..> UC13 : <<extend>>
+    UC7 ..> UC8 : <<extend>>
+    UC7 ..> UC12 : <<extend>>
+    UC1 ..> UC15 : <<include>>
+}
 
 User --> UC1
 User --> UC2
@@ -29,15 +40,8 @@ User --> UC7
 User --> UC11
 User --> UC13
 
-UC4 ..> UC14 : <<include>>
-UC5 ..> UC14 : <<include>>
-UC5 ..> UC13 : <<extend>>
-UC7 ..> UC8 : <<extend>>
-UC7 ..> UC12 : <<extend>>
-UC1 ..> UC15 : <<include>>
-
-KC --> UC1
-KC --> UC2
-KC --> UC3
+UC1 --> KC
+UC2 --> KC
+UC3 --> KC
 
 @enduml

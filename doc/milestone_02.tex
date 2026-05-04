@@ -66,15 +66,9 @@
 % ============================================================
 \section{Wprowadzenie}
 
-Niniejszy dokument stanowi raport z~drugiego kamienia milowego projektu \emph{Aplikacja do zarządzania zadaniami}. Etap ten obejmuje:
-\begin{itemize}
-  \item implementację podstawowych funkcjonalności systemu (REST API, persystencja, autoryzacja, interfejs użytkownika),
-  \item przygotowanie diagramu sekwencji dla wybranego scenariusza,
-  \item przygotowanie diagramu aktywności dla wybranego procesu systemowego,
-  \item aktualizację wcześniej wykonanych diagramów (przypadków użycia, klas, komponentów oraz warstw) zgodnie z~rzeczywistą implementacją.
-\end{itemize}
+Niniejszy dokument jest \textbf{uzupełnieniem} raportu z~kamienia milowego~I i~koncentruje się wyłącznie na elementach wymaganych w~drugim etapie: stanie implementacji, diagramie sekwencji, diagramie aktywności oraz aktualizacjach wcześniej przygotowanych diagramów. Pozostałe sekcje (cel i~zakres systemu, aktorzy, wymagania funkcjonalne i~niefunkcjonalne, słownik pojęć, pełen stos technologiczny) nie są tu powtarzane -- pozostają one w~dokumencie KM~I.
 
-W~stosunku do pierwszego kamienia milowego nastąpiła istotna zmiana stosu technologicznego po stronie backendu -- początkowo planowany Spring Boot (Java) został zastąpiony przez \textbf{Go} z~routerem \texttt{chi} oraz generatorem kodu \texttt{sqlc}. Decyzja była motywowana chęcią wypróbowania języka Go w~praktyce.
+W~stosunku do KM~I nastąpiła jedna istotna zmiana stosu technologicznego: zaplanowany Spring Boot (Java) po stronie backendu został zastąpiony przez \textbf{Go} (router \texttt{chi}, generator \texttt{sqlc}). Decyzja była motywowana chęcią wypróbowania języka Go w~praktyce. Pozostałe elementy stosu (frontend React, Keycloak, PostgreSQL, Docker) pozostały bez zmian.
 
 % ============================================================
 % 2. STAN IMPLEMENTACJI
@@ -89,18 +83,15 @@ Projekt zorganizowany jest jako monorepo zawierające dwie aplikacje:
 \end{itemize}
 oraz konfigurację infrastruktury (\texttt{docker-compose.yml}, \texttt{docker/keycloak/realm.json}, \texttt{flake.nix}).
 
-\subsection{Funkcjonalności zaimplementowane}
+\subsection{Szczegóły implementacyjne}
 
+Poniżej zebrano elementy implementacyjne uzupełniające wymagania funkcjonalne z~KM~I:
 \begin{itemize}
-  \item \textbf{Uwierzytelnianie i~autoryzacja} -- middleware HTTP weryfikujący tokeny JWT przy użyciu kluczy publicznych pobieranych z~serwisu Keycloak (JWKS). Pierwsze żądanie nowego użytkownika powoduje automatyczną synchronizację profilu (utworzenie wpisu w~tabeli \texttt{users} na podstawie pól \texttt{sub}, \texttt{name}, \texttt{email} z~tokenu).
-  \item \textbf{Zarządzanie zadaniami (CRUD)} -- pełen zestaw operacji \texttt{POST}, \texttt{GET}, \texttt{PUT}, \texttt{DELETE} na zasobie zadań, zagnieżdżonym pod identyfikatorem użytkownika.
-  \item \textbf{Filtrowanie listy zadań} -- parametry zapytania \texttt{status} oraz \texttt{priority} są walidowane i~przekazywane do dedykowanych zapytań SQL.
-  \item \textbf{Dashboard} -- agregujący endpoint zliczający zadania zgrupowane po statusie (\texttt{todo}, \texttt{in\_progress}, \texttt{done}) oraz całkowitą liczbę zadań.
-  \item \textbf{Walidacja danych wejściowych} -- DTO posiadają metody \texttt{Validate()} sprawdzające obecność tytułu, dopuszczalne wartości statusu i~priorytetu oraz format daty (\texttt{YYYY-MM-DD}).
-  \item \textbf{Dokumentacja API} -- automatycznie generowana specyfikacja OpenAPI / Swagger UI dostępna pod ścieżką \texttt{/swagger}, z~konfiguracją OAuth2/PKCE wskazującą na realm Keycloak.
-  \item \textbf{Health check} -- endpoint \texttt{/health} weryfikujący dostępność bazy danych.
-  \item \textbf{Frontend} -- responsywny interfejs zbudowany w~React 19, z~Redux Toolkit (\texttt{createEntityAdapter}, thunki), komponentami z~biblioteki shadcn/ui i~stylowaniem Tailwind CSS v4. Strona \texttt{TasksPage} prezentuje statystyki, listę zadań oraz dialog tworzenia.
-  \item \textbf{Konteneryzacja} -- \texttt{docker-compose.yml} uruchamia PostgreSQL (osobne instancje dla aplikacji i~Keycloaka), Keycloak (z~importem realmu) oraz panel Adminer.
+  \item \textbf{AuthMiddleware (chi)} -- weryfikuje JWT w~oparciu o~klucze publiczne pobierane z~JWKS Keycloaka; przy pierwszym żądaniu nowego użytkownika automatycznie tworzy wpis w~tabeli \texttt{users} na podstawie pól \texttt{sub}, \texttt{name}, \texttt{email} z~tokenu.
+  \item \textbf{Walidacja DTO} -- metody \texttt{Validate()} na strukturach żądania kontrolują obecność tytułu, dopuszczalne wartości statusu/priorytetu oraz format daty (\texttt{YYYY-MM-DD}).
+  \item \textbf{Generowane zapytania (sqlc)} -- wszystkie operacje na bazie korzystają ze statycznie typowanych funkcji wygenerowanych z~plików \texttt{queries/*.sql}; agregacja dashboardu wykonywana jest jednym zapytaniem \texttt{GROUP BY status}.
+  \item \textbf{Swagger UI} -- automatycznie generowana specyfikacja OpenAPI dostępna pod \texttt{/swagger}, z~konfiguracją OAuth2/PKCE wskazującą na realm Keycloak.
+  \item \textbf{Frontend (Redux Toolkit)} -- stan zadań trzymany w~slice z~\texttt{createEntityAdapter}, operacje wykonywane przez thunki (\texttt{fetchTasks}, \texttt{createTask}, \texttt{deleteTask}).
 \end{itemize}
 
 \subsection{Lista endpointów REST}
@@ -129,29 +120,14 @@ GET    & /users/\{userId\}/dashboard          & Statystyki zadań użytkownika &
 Migracje (\texttt{goose}) tworzą tabele \texttt{users} oraz \texttt{tasks}, a~także typy wyliczeniowe \texttt{task\_status} (\texttt{todo}, \texttt{in\_progress}, \texttt{done}) i~\texttt{task\_priority} (\texttt{low}, \texttt{medium}, \texttt{high}). Tabela \texttt{tasks} posiada klucz obcy \texttt{user\_id} z~kaskadowym usuwaniem oraz znaczniki czasowe \texttt{created\_at}, \texttt{updated\_at}.
 
 % ============================================================
-% 3. STOS TECHNOLOGICZNY (AKTUALIZACJA)
-% ============================================================
-\section{Stos technologiczny -- aktualizacja}
-
-\begin{itemize}
-  \item \textbf{Frontend:} React 19, TypeScript, Vite 8, Tailwind CSS v4, shadcn/ui, React Router v7, Redux Toolkit, react-redux.
-  \item \textbf{Backend:} Go (chi router, sqlc, goose, slog, swaggo).
-  \item \textbf{Baza danych:} PostgreSQL 16.
-  \item \textbf{Uwierzytelnianie:} Keycloak 26.2 (OAuth2 / OpenID Connect, PKCE, JWKS).
-  \item \textbf{Konteneryzacja:} Docker, Docker Compose.
-  \item \textbf{Środowisko deweloperskie:} Nix flake (\texttt{flake.nix}) oraz \texttt{Taskfile.yml}.
-  \item \textbf{Kontrola wersji:} Git.
-\end{itemize}
-
-% ============================================================
-% 4. ZAKTUALIZOWANE DIAGRAMY Z KAMIENIA I
+% 3. ZAKTUALIZOWANE DIAGRAMY Z KAMIENIA I
 % ============================================================
 \section{Zaktualizowane diagramy z~kamienia I}
 
 Wszystkie diagramy zostały dostosowane do rzeczywistej implementacji.
 
 \subsection{Diagram przypadków użycia}
-W~stosunku do wersji z~kamienia I dodany został przypadek \emph{Synchronizuj profil użytkownika}, włączany przez przypadek \emph{Zaloguj się} -- odpowiada on faktycznemu mechanizmowi tworzenia rekordu w~tabeli \texttt{users} przy pierwszym żądaniu autoryzowanym.
+Diagram został otoczony granicą systemu \emph{Aplikacja Todo}. \emph{Użytkownik} -- jako bezpośredni odbiorca aplikacji -- został umieszczony wewnątrz granicy, natomiast \emph{Keycloak} jako zewnętrzny dostawca uwierzytelniania pozostaje poza nią. Dodano przypadek \emph{Synchronizuj profil użytkownika} (\texttt{<<include>>} w~\emph{Zaloguj się}) odpowiadający faktycznemu mechanizmowi tworzenia rekordu w~tabeli \texttt{users} przy pierwszym żądaniu autoryzowanym.
 
 \begin{figure}[H]
   \centering
