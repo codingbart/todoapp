@@ -12,11 +12,12 @@ usecase "Utwórz zadanie" as UC4
 usecase "Edytuj zadanie" as UC5
 usecase "Usuń zadanie" as UC6
 usecase "Wyświetl listę zadań" as UC7
-usecase "Filtruj listę zadań" as UC8
+usecase "Filtruj listę zadań\n(status, priorytet)" as UC8
 usecase "Wyświetl dashboard" as UC11
 usecase "Wyświetl szczegóły zadania" as UC12
 usecase "Zmień status zadania" as UC13
 usecase "Ustaw priorytet zadania" as UC14
+usecase "Synchronizuj profil\nużytkownika" as UC15
 
 User --> UC1
 User --> UC2
@@ -33,6 +34,7 @@ UC5 ..> UC14 : <<include>>
 UC5 ..> UC13 : <<extend>>
 UC7 ..> UC8 : <<extend>>
 UC7 ..> UC12 : <<extend>>
+UC1 ..> UC15 : <<include>>
 
 KC --> UC1
 KC --> UC2

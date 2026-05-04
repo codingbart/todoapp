@@ -1,0 +1,62 @@
+@startuml
+title Diagram sekwencji: Utworzenie nowego zadania
+
+actor "Użytkownik" as U
+participant "TasksPage\n(React)" as Page
+participant "TaskDialog" as Dialog
+participant "tasksThunks\n(createTask)" as Thunk
+participant "tasksSlice\n(reducer)" as Slice
+participant "chi Router" as Router
+participant "AuthMiddleware" as Auth
+participant "Keycloak\n(JWKS)" as KC
+participant "TaskHandler" as Handler
+participant "TaskService" as Service
+participant "Queries (sqlc)" as DB
+database "PostgreSQL" as PG
+
+U -> Page: kliknięcie "Nowe zadanie"
+Page -> Dialog: open()
+U -> Dialog: wypełnia formularz\n(title, description,\nstatus, priority, due_date)
+U -> Dialog: kliknięcie "Zapisz"
+Dialog -> Thunk: dispatch(createTask(task))
+Thunk -> Router: POST /api/users/{userId}/tasks\nAuthorization: Bearer <JWT>
+
+Router -> Auth: Protect(handler)
+Auth -> KC: pobranie kluczy JWKS\n(weryfikacja podpisu)
+KC --> Auth: klucze publiczne
+Auth -> Auth: walidacja JWT\n(podpis, exp, iss)
+
+alt token poprawny
+    Auth -> DB: FindUserByKeycloakId(sub)
+    alt użytkownik nie istnieje
+        Auth -> DB: SaveUser(sub, name, email)
+        DB -> PG: INSERT INTO users
+        PG --> DB: User
+        DB --> Auth: User
+    else użytkownik istnieje
+        DB --> Auth: User
+    end
+    Auth -> Handler: next(ctx z userID)
+    Handler -> Handler: parsowanie JSON\n+ walidacja DTO
+    alt dane prawidłowe
+        Handler -> Service: Create(ctx, userID, req)
+        Service -> DB: CreateTask(params)
+        DB -> PG: INSERT INTO tasks RETURNING *
+        PG --> DB: Task
+        DB --> Service: Task
+        Service --> Handler: TaskResponse
+        Handler --> Router: 201 Created\n+ JSON body
+    else walidacja nieudana
+        Handler --> Router: 400 Bad Request
+    end
+else token niepoprawny
+    Auth --> Router: 401 Unauthorized
+end
+
+Router --> Thunk: HTTP response
+Thunk -> Slice: createTask.fulfilled(task)
+Slice -> Slice: tasksAdapter.addOne(task)
+Slice --> Page: re-render z nowym zadaniem
+Page --> U: lista odświeżona
+
+@enduml

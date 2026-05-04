@@ -1,68 +1,81 @@
 @startuml
 skinparam componentStyle rectangle
 
-package "Frontend (React SPA)" {
+package "Frontend (React 19 SPA)" {
     [App] as app
-    [Router] as router
-    [AuthProvider] as auth
+    [Router\n(react-router v7)] as router
+    [Redux Store\n(Redux Toolkit)] as store
 
     package "Strony" {
-        [DashboardPage] as dashboard
         [TasksPage] as tasks
-        [TaskForm] as form
-        [TaskDetailPage] as detail
     }
 
     package "Komponenty UI" {
-        [Header] as header
-        [Sidebar] as sidebar
-        [MobileNav] as mobile
-        [TaskSummaryCards] as summary
+        [Layout] as layout
+        [TaskDialog] as dialog
+        [TaskItem] as item
+        [StatCard] as stat
+        [ProfileMenu] as profile
+    }
+
+    package "Stan aplikacji" {
+        [tasksSlice] as slice
+        [tasksThunks\n(fetch/create/delete)] as thunks
+        [tasksSelectors] as selectors
     }
 
     package "Komponenty bazowe (shadcn/ui)" {
         [Button] as btn
         [Input] as input
-        [Select] as select
-        [Card] as card
-        [Badge] as badge
+        [Dialog] as dlg
+        [Tooltip] as tooltip
     }
 }
 
-package "Backend (REST API)" {
-    [TaskController] as taskCtrl
-    [UserController] as userCtrl
+package "Backend (Go REST API)" {
+    [Router (chi)] as chi
+    [AuthMiddleware\n(JWT + Keycloak JWKS)] as authmw
+    [TaskHandler] as taskCtrl
+    [HealthHandler] as healthCtrl
     [TaskService] as taskSvc
-    [UserService] as userSvc
-    [TaskRepository] as taskRepo
-    [UserRepository] as userRepo
+    [HealthService] as healthSvc
+    [Queries (sqlc)] as repo
+    [Swagger UI] as swagger
 }
 
-package "Zewnętrzne" {
-    database "PostgreSQL" as db
-    [Keycloak] as kc
+package "Systemy zewnętrzne" {
+    database "PostgreSQL\n(tasks, users)" as db
+    [Keycloak\n(realm: todoapp)] as kc
+    database "PostgreSQL\n(Keycloak)" as kcdb
 }
 
 app --> router
-app --> auth
-router --> dashboard
+app --> store
 router --> tasks
-router --> form
-router --> detail
+tasks --> dialog
+tasks --> item
+tasks --> stat
+layout --> profile
+slice <.. thunks
+selectors ..> slice
+tasks --> selectors
+tasks --> thunks
 
-dashboard --> summary
-
+chi --> authmw
+authmw --> kc : weryfikacja JWT (JWKS)
+authmw --> repo : sync użytkownika
+chi --> taskCtrl
+chi --> healthCtrl
+chi --> swagger
 taskCtrl --> taskSvc
-userCtrl --> userSvc
-taskSvc --> taskRepo
-userSvc --> userRepo
-taskRepo --> db
-userRepo --> db
+healthCtrl --> healthSvc
+taskSvc --> repo
+healthSvc --> repo
+repo --> db
 
-auth --> kc
-userCtrl --> kc
+kc --> kcdb
 
-app --> taskCtrl : REST API\n(/api/tasks)
-app --> userCtrl : REST API\n(/api/users)
+thunks ..> chi : REST API\n(/api/users/{id}/tasks,\n/api/users/{id}/dashboard)
+profile ..> kc : login / logout
 
 @enduml

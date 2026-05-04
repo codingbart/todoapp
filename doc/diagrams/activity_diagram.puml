@@ -1,0 +1,82 @@
+@startuml
+title Diagram aktywności: Obsługa żądania zarządzania zadaniem
+
+|Użytkownik|
+start
+:wybiera akcję\n(utwórz / edytuj /\nzmień status / usuń);
+
+|Frontend (React + Redux)|
+:przygotowanie payloadu;
+:dispatch thunka\n(createTask / updateTask /\ndeleteTask);
+:wysłanie żądania HTTP\nz nagłówkiem Authorization;
+
+|Backend (chi router)|
+:dopasowanie trasy\n/api/users/{userId}/...;
+
+|AuthMiddleware|
+:wyciągnięcie tokenu\nz nagłówka Authorization;
+if (token obecny\ni format poprawny?) then (tak)
+    :pobranie kluczy z JWKS\nKeycloak;
+    if (podpis i claims\npoprawne?) then (tak)
+        :synchronizacja użytkownika\n(FindUserByKeycloakId\nlub SaveUser);
+        :zapis userID do kontekstu;
+    else (nie)
+        |Backend (chi router)|
+        :HTTP 401 Unauthorized;
+        |Frontend (React + Redux)|
+        :rejected -> błąd auth;
+        stop
+    endif
+else (nie)
+    |Backend (chi router)|
+    :HTTP 401 Unauthorized;
+    |Frontend (React + Redux)|
+    :rejected -> błąd auth;
+    stop
+endif
+
+|TaskHandler|
+:parsowanie ścieżki i body;
+if (DTO/parametry poprawne?) then (tak)
+    :wywołanie odpowiedniej\nmetody serwisu;
+else (nie)
+    |Backend (chi router)|
+    :HTTP 400 Bad Request;
+    |Frontend (React + Redux)|
+    :rejected -> błąd walidacji;
+    stop
+endif
+
+|TaskService|
+:przygotowanie parametrów\n(konwersja typów,\nzero-value handling);
+:wywołanie zapytania\nQueries (sqlc);
+
+|PostgreSQL|
+:wykonanie zapytania\nSELECT/INSERT/UPDATE/DELETE;
+if (operacja udana?) then (tak)
+    :zwrócenie rekordu\nlub liczby wierszy;
+else (nie - sql.ErrNoRows)
+    |TaskService|
+    :propagacja błędu;
+    |TaskHandler|
+    :HTTP 404 Not Found;
+    |Frontend (React + Redux)|
+    :rejected -> zasób\nnie istnieje;
+    stop
+endif
+
+|TaskService|
+:mapowanie\ndb.Task -> TaskResponse;
+
+|TaskHandler|
+:zapis odpowiedzi JSON\n(200/201/204);
+
+|Frontend (React + Redux)|
+:fulfilled -> aktualizacja\ntasksAdapter w slice;
+:re-render listy zadań;
+
+|Użytkownik|
+:widzi zaktualizowaną listę\ni statystyki dashboardu;
+stop
+
+@enduml

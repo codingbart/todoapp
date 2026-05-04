@@ -3,15 +3,18 @@ skinparam classAttributeIconSize 0
 
 class User {
     - id: UUID
+    - keycloakId: String
     - name: String
     - email: String
-    - keycloakId: String
+    - createdAt: DateTime
+    - updatedAt: DateTime
     --
     + getTasks(): List<Task>
 }
 
 class Task {
     - id: UUID
+    - userId: UUID
     - title: String
     - description: String
     - status: TaskStatus
@@ -25,19 +28,33 @@ class Task {
 }
 
 enum TaskStatus {
-    TODO
-    IN_PROGRESS
-    DONE
+    todo
+    in_progress
+    done
 }
 
 enum TaskPriority {
-    LOW
-    MEDIUM
-    HIGH
+    low
+    medium
+    high
+}
+
+class TaskFilters {
+    - status: TaskStatus
+    - priority: TaskPriority
+}
+
+class DashboardSummary {
+    - todo: int
+    - inProgress: int
+    - done: int
+    - total: int
 }
 
 User "1" -- "0..*" Task : posiada >
 Task --> TaskStatus : ma status >
 Task --> TaskPriority : ma priorytet >
+TaskFilters ..> Task : filtruje >
+DashboardSummary ..> Task : agreguje >
 
 @enduml

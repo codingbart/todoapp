@@ -5,22 +5,22 @@ skinparam defaultTextAlignment center
 skinparam rectangleFontSize 13
 
 together {
-    rectangle "<b>Warstwa prezentacji</b>\nReact SPA\nshadcn/ui\nTailwind CSS\nReact Router" as presentation
-    rectangle "<b>Warstwa API</b>\nREST API (HTTP/JSON)" as api_layer
-    rectangle "<b>Warstwa logiki biznesowej</b>\nKontrolery\nSerwisy\nWalidacja" as business
-    rectangle "<b>Warstwa dostępu do danych</b>\nRepozytoria\nORM" as data_access
-    rectangle "<b>Warstwa danych</b>\nPostgreSQL" as data
+    rectangle "<b>Warstwa prezentacji</b>\nReact 19 SPA\nshadcn/ui + Tailwind CSS v4\nReact Router v7\nRedux Toolkit (store, slices)" as presentation
+    rectangle "<b>Warstwa API</b>\nREST (HTTP/JSON)\nchi router + Swagger UI" as api_layer
+    rectangle "<b>Warstwa logiki biznesowej</b>\nHandlery (task, health)\nService'y\nWalidatory DTO" as business
+    rectangle "<b>Warstwa dostępu do danych</b>\nQueries generowane przez sqlc\ndatabase/sql + lib/pq" as data_access
+    rectangle "<b>Warstwa danych</b>\nPostgreSQL 16\nMigracje goose\n(users, tasks, ENUMy)" as data
 }
 
-rectangle "<b>Bezpieczeństwo</b>\nKeycloak\nJWT" as security
+rectangle "<b>Bezpieczeństwo</b>\nKeycloak (OIDC)\nJWT + JWKS\nAuthMiddleware (chi)" as security
 
 presentation -down-> api_layer
 api_layer -down-> business
 business -down-> data_access
 data_access -down-> data
 
-security -right-> presentation : ochrona tras
-security -right-> api_layer : weryfikacja tokenów
-security -right-> business : autoryzacja
+security -right-> presentation : ochrona tras (token)
+security -right-> api_layer : weryfikacja JWT
+security -right-> business : autoryzacja\n(user sync)
 
 @enduml
