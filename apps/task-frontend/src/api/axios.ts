@@ -1,9 +1,10 @@
 // https://orval.dev/docs/guides/custom-axios/
 
 import Axios, { type AxiosRequestConfig, AxiosError } from 'axios';
+import { API_URL } from '@/lib/env';
 
 const _axiosInstance = Axios.create({
-    baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
+    baseURL: API_URL
 });
 
 _axiosInstance.interceptors.request.use(
