@@ -16,11 +16,13 @@ type StatCardProps = {
 export function StatCard({ label, value, variant = 'default' }: StatCardProps) {
     return (
         <Card>
-            <CardHeader>
-                <CardTitle>{label}</CardTitle>
+            <CardHeader className='p-3 pb-1 sm:p-4 sm:pb-2'>
+                <CardTitle className='text-xs sm:text-sm'>{label}</CardTitle>
             </CardHeader>
-            <CardContent>
-                <p className={cn('text-3xl font-bold', variantStyles[variant])}>{value}</p>
+            <CardContent className='p-3 pt-0 sm:p-4 sm:pt-0'>
+                <p className={cn('text-2xl font-bold sm:text-3xl', variantStyles[variant])}>
+                    {value}
+                </p>
             </CardContent>
         </Card>
     );

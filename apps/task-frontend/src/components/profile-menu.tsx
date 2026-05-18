@@ -28,7 +28,7 @@ export function ProfileMenu() {
                 <span className='bg-primary text-primary-foreground flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold'>
                     {initials(user.name)}
                 </span>
-                <div className='text-left'>
+                <div className='hidden text-left sm:block'>
                     <p className='text-sm leading-tight font-medium'>{user.name}</p>
                     <p className='text-muted-foreground text-xs leading-tight'>{user.email}</p>
                 </div>

@@ -38,7 +38,7 @@ type TaskItemProps = {
 
 export function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
     return (
-        <div className='flex items-center gap-4 px-4 py-3'>
+        <div className='flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-4'>
             <div className='min-w-0 flex-1'>
                 <p className='truncate text-sm font-medium'>{task.title}</p>
                 {task.description && (
@@ -47,14 +47,14 @@ export function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
                     </p>
                 )}
             </div>
-            <div className='flex shrink-0 items-center gap-2'>
+            <div className='flex shrink-0 flex-wrap items-center gap-2'>
                 <Badge variant={priorityVariants[task.priority]}>
                     {priorityLabels[task.priority]}
                 </Badge>
                 <Badge variant={statusVariants[task.status]}>
                     {statusLabels[task.status]}
                 </Badge>
-                <span className='text-muted-foreground w-24 text-right text-xs'>
+                <span className='text-muted-foreground text-xs sm:w-24 sm:text-right'>
                     {task.dueDate || '—'}
                 </span>
                 <Button variant='ghost' size='icon-sm' onClick={() => onEdit(task)}>

@@ -29,7 +29,7 @@ export function TasksPage() {
 
     return (
         <div className='space-y-6'>
-            <div className='grid grid-cols-3 gap-4'>
+            <div className='grid grid-cols-3 gap-2 sm:gap-4'>
                 <StatCard label='Do zrobienia' value={countTasksByStatus('todo')} />
                 <StatCard
                     label='W toku'
@@ -39,11 +39,12 @@ export function TasksPage() {
                 <StatCard label='Ukończone' value={countTasksByStatus('done')} variant='success' />
             </div>
             <div className='space-y-4'>
-                <div className='flex items-center justify-between'>
-                    <h1 className='text-2xl font-semibold'>Zadania</h1>
+                <div className='flex items-center justify-between gap-2'>
+                    <h1 className='text-xl font-semibold sm:text-2xl'>Zadania</h1>
                     <Button onClick={() => setDialogOpen(true)}>
                         <Plus />
-                        Nowe zadanie
+                        <span className='hidden sm:inline'>Nowe zadanie</span>
+                        <span className='sm:hidden'>Nowe</span>
                     </Button>
                 </div>
                 <div className='divide-y rounded-lg border'>
