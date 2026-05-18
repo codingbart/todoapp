@@ -1,0 +1,72 @@
+version: '3'
+
+vars:
+  DIAGRAMS_DIR: diagrams
+  BACKEND_DIR: ../apps/task-api
+  FRONTEND_DIR: ../apps/task-frontend
+  BACKEND_3RD_PARTY_PREFIXES: github.com/jackc,github.com/go-chi,github.com/swaggo,github.com/MicahParks,github.com/golang-jwt,github.com/google,github.com/kelseyhightower
+  BACKEND_MODULE_PREFIX: github.com/codingbart/todoapp/task-api/
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  deps:backend:
+    desc: Regenerate backend package dependency graph (godepgraph + Graphviz)
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - godepgraph -s -nostdlib -p {{.BACKEND_3RD_PARTY_PREFIXES}} ./cmd
+        | sed 's|{{.BACKEND_MODULE_PREFIX}}||g'
+        | dot -Tpng -o ../../doc/{{.DIAGRAMS_DIR}}/backend_deps.png
+
+  deps:frontend:
+    desc: Regenerate frontend module dependency graph (madge + Graphviz)
+    dir: '{{.FRONTEND_DIR}}'
+    cmds:
+      - npx --yes madge --no-color
+        --extensions ts,tsx
+        --ts-config tsconfig.json
+        --exclude '^components/ui|^lib/utils|^lib/env|^generated'
+        --dot src/main.tsx
+        | dot -Grankdir=TB -Gbgcolor=white -Gdpi=180
+        -Gnodesep=0.25 -Granksep=0.55
+        -Nshape=box -Nstyle='rounded,filled' -Nfillcolor='#f5f5f5'
+        -Nfontcolor=black -Nfontsize=11 -Ncolor=black -Ecolor='#333333'
+        -Tpng -o ../../doc/{{.DIAGRAMS_DIR}}/frontend_deps.png
+
+  deps:
+    desc: Regenerate both dependency graphs
+    cmds:
+      - task: deps:backend
+      - task: deps:frontend
+
+  diagrams:
+    desc: Regenerate all PlantUML diagrams (PUML -> PNG)
+    cmds:
+      - plantuml -tpng {{.DIAGRAMS_DIR}}/*.puml
+
+  metrics:
+    desc: Capture raw tokei + gocyclo output into generated/
+    cmds:
+      - bash scripts/gen-metrics.sh
+
+  pdf:
+    desc: Build the final report PDF (obrna.pdf)
+    cmds:
+      - latexmk -xelatex -shell-escape -interaction=nonstopmode obrona.tex
+
+  clean:
+    desc: Remove LaTeX build artifacts
+    cmds:
+      - rm -f obrna.aux obrna.toc obrna.out obrna.log obrna.xdv
+      - rm -rf _minted-obrna _minted
+
+  install:tools:
+    desc: Install external tools required for diagram and metric regeneration
+    cmds:
+      - go install github.com/kisielk/godepgraph@latest
+      - go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+      - echo "madge is invoked via 'npx --yes madge' -- no global install needed"
+      - echo "tokei, Graphviz (dot), plantuml and python3 must be available in PATH"

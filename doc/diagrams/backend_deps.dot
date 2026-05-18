@@ -1,0 +1,31 @@
+digraph godep {
+splines=ortho
+nodesep=0.4
+ranksep=0.8
+node [shape="box",style="rounded,filled"]
+edge [arrowsize="0.5"]
+"./cmd" [label="./cmd" color="paleturquoise" URL="https://godoc.org/./cmd" target="_blank"];
+"./cmd" -> "docs";
+"./cmd" -> "internal/config";
+"./cmd" -> "internal/db/postgresql";
+"./cmd" -> "internal/health";
+"./cmd" -> "internal/logger";
+"./cmd" -> "internal/middleware";
+"./cmd" -> "internal/task";
+"docs" [label="docs" color="paleturquoise" URL="https://godoc.org/docs" target="_blank"];
+"internal/config" [label="internal/config" color="paleturquoise" URL="https://godoc.org/internal/config" target="_blank"];
+"internal/config" -> "internal/logger";
+"internal/db/postgresql" [label="internal/db/postgresql" color="paleturquoise" URL="https://godoc.org/internal/db/postgresql" target="_blank"];
+"internal/db/postgresql" -> "internal/config";
+"internal/health" [label="internal/health" color="paleturquoise" URL="https://godoc.org/internal/health" target="_blank"];
+"internal/health" -> "internal/response";
+"internal/logger" [label="internal/logger" color="paleturquoise" URL="https://godoc.org/internal/logger" target="_blank"];
+"internal/middleware" [label="internal/middleware" color="paleturquoise" URL="https://godoc.org/internal/middleware" target="_blank"];
+"internal/middleware" -> "internal/db/postgresql";
+"internal/middleware" -> "internal/response";
+"internal/response" [label="internal/response" color="paleturquoise" URL="https://godoc.org/internal/response" target="_blank"];
+"internal/task" [label="internal/task" color="paleturquoise" URL="https://godoc.org/internal/task" target="_blank"];
+"internal/task" -> "internal/db/postgresql";
+"internal/task" -> "internal/middleware";
+"internal/task" -> "internal/response";
+}

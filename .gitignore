@@ -8,3 +8,4 @@
 .env
 .gocache
 .direnv
+doc/_minted

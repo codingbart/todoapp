@@ -17,6 +17,9 @@
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             go
+            nodejs
+            tokei
+            gocyclo
           ];
         };
       }
