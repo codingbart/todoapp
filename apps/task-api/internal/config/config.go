@@ -12,6 +12,7 @@ type Config struct {
 	Port                    uint
 	DBUrl                   string
 	BasePath                string
+	CORSAllowedOrigins      string
 	KeycloakJWKSURL         string
 	KeycloakAuthURL         string
 	KeycloakTokenURL        string
@@ -29,6 +30,7 @@ func NewConfig(log logger.Logger) Config {
 		Port:                    cl.getEnvAsUint("API_PORT", 8080),
 		DBUrl:                   cl.getEnvAsString("API_DB_URL", "postgres://todoapp:todoapp@localhost:5432/todoapp?sslmode=disable"),
 		BasePath:                cl.getEnvAsString("API_BASE_PATH", "/api"),
+		CORSAllowedOrigins:      cl.getEnvAsString("API_CORS_ALLOWED_ORIGINS", "http://localhost:5173"),
 		KeycloakJWKSURL:         cl.getEnvAsString("API_KEYCLOAK_JWKS_URL", "http://localhost:8080/realms/todoapp/protocol/openid-connect/certs"),
 		KeycloakAuthURL:         cl.getEnvAsString("API_KEYCLOAK_AUTH_URL", "http://localhost:8080/realms/todoapp/protocol/openid-connect/auth"),
 		KeycloakTokenURL:        cl.getEnvAsString("API_KEYCLOAK_TOKEN_URL", "http://localhost:8080/realms/todoapp/protocol/openid-connect/token"),

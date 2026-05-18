@@ -13,6 +13,7 @@ import (
 	"github.com/codingbart/todoapp/task-api/internal/middleware"
 	"github.com/codingbart/todoapp/task-api/internal/task"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -37,6 +38,13 @@ func NewApplication(config config.Config, logger logger.Logger, queries *db.Quer
 
 func (app *app) Mount() http.Handler {
 	r := chi.NewRouter()
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   strings.Split(app.config.CORSAllowedOrigins, ","),
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowCredentials: false,
+	}))
 
 	app.configureSwagger()
 
