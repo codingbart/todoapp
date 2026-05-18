@@ -1,7 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { SpinnerScreen } from '@/components/spinner-screen';
 import { z } from 'zod';
 import { keycloak } from '@/lib/keycloak';
 import { AuthContext, type AuthContextValue } from '@/context/auth-context';
+import { FadeIn } from '@/components/fade-in';
 
 const ClaimsSchema = z.object({
     sub: z.string(),
@@ -25,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     if (isLoading) {
-        return 'Ładowanie...';
+        return <SpinnerScreen />;
     }
 
     const claims = ClaimsSchema.parse(keycloak.tokenParsed);
@@ -39,5 +41,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout: () => keycloak.logout()
     };
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={value}>
+            <FadeIn>{children}</FadeIn>
+        </AuthContext.Provider>
+    );
 }
