@@ -9,7 +9,7 @@ export default defineConfig({
             namingConvention: 'camelCase',
             override: {
                 mutator: {
-                    path: './src/api/axios.ts',
+                    path: './src/lib/axios.ts',
                     name: 'axiosInstance'
                 }
             }

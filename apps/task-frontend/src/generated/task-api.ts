@@ -5,8 +5,8 @@
  * REST API dla aplikacji todo
  * OpenAPI spec version: 1.0
  */
-import { axiosInstance } from '../api/axios';
-import type { BodyType } from '../api/axios';
+import { axiosInstance } from '../lib/axios';
+import type { BodyType } from '../lib/axios';
 export interface HealthHealthResponse {
     status: string;
 }

@@ -1,26 +1,22 @@
 // https://orval.dev/docs/guides/custom-axios/
 
 import Axios, { type AxiosRequestConfig, AxiosError } from 'axios';
-import { API_URL } from '@/lib/env';
+import { env } from '@/lib/env';
+import { keycloak } from '@/lib/keycloak';
 
 const _axiosInstance = Axios.create({
-    baseURL: API_URL
+    baseURL: env.VITE_API_URL
 });
 
 _axiosInstance.interceptors.request.use(
     config => {
-        // TODO: add jwt to header
+        if (keycloak.token) {
+            config.headers.Authorization = `Bearer ${keycloak.token}`;
+        }
+
         return config;
     },
     error => Promise.reject(error)
-);
-
-_axiosInstance.interceptors.response.use(
-    response => response,
-    error => {
-        // TODO: refresh jwt
-        return Promise.reject(error);
-    }
 );
 
 export async function axiosInstance<T>(

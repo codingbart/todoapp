@@ -1,7 +1,8 @@
 import { type ReactNode } from 'react';
-import { Provider } from 'react-redux';
+import { Provider as StoreProvider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { AuthProvider } from '@/providers/auth-provider';
 import { store } from '@/lib/store';
 
 type ProvidersProps = {
@@ -10,10 +11,12 @@ type ProvidersProps = {
 
 export function Providers({ children }: ProvidersProps) {
     return (
-        <Provider store={store}>
-            <BrowserRouter>
-                <TooltipProvider>{children}</TooltipProvider>
-            </BrowserRouter>
-        </Provider>
+        <AuthProvider>
+            <StoreProvider store={store}>
+                <BrowserRouter>
+                    <TooltipProvider>{children}</TooltipProvider>
+                </BrowserRouter>
+            </StoreProvider>
+        </AuthProvider>
     );
 }

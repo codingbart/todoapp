@@ -1,44 +1,55 @@
 import { LogOut, User } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-    DropdownMenuTrigger,
+    DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 
-const mockUser = {
-    name: 'John Doe',
-    email: 'johndoe@example.com',
-    initials: 'JD',
-};
+function initials(name: string): string {
+    return name
+        .split(' ')
+        .slice(0, 2)
+        .map(w => w[0])
+        .join('')
+        .toUpperCase();
+}
 
 export function ProfileMenu() {
+    const { user, logout } = useAuth();
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className='hover:bg-muted flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors outline-none'>
                 <span className='bg-primary text-primary-foreground flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold'>
-                    {mockUser.initials}
+                    {initials(user.name)}
                 </span>
                 <div className='text-left'>
-                    <p className='text-sm leading-tight font-medium'>{mockUser.name}</p>
-                    <p className='text-muted-foreground text-xs leading-tight'>{mockUser.email}</p>
+                    <p className='text-sm leading-tight font-medium'>{user.name}</p>
+                    <p className='text-muted-foreground text-xs leading-tight'>{user.email}</p>
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
-                <DropdownMenuLabel className='text-muted-foreground text-xs'>
-                    {mockUser.email}
-                </DropdownMenuLabel>
+                <DropdownMenuGroup>
+                    <DropdownMenuLabel className='text-muted-foreground text-xs'>
+                        {user.email}
+                    </DropdownMenuLabel>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    <User />
-                    Profil
-                </DropdownMenuItem>
-                <DropdownMenuItem variant='destructive'>
-                    <LogOut />
-                    Wyloguj
-                </DropdownMenuItem>
+                <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                        <User />
+                        Profil
+                    </DropdownMenuItem>
+                    <DropdownMenuItem variant='destructive' onClick={logout}>
+                        <LogOut />
+                        Wyloguj
+                    </DropdownMenuItem>
+                </DropdownMenuGroup>
             </DropdownMenuContent>
         </DropdownMenu>
     );
