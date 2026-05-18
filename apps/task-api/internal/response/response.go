@@ -12,9 +12,7 @@ func writeJSON(w http.ResponseWriter, status int, body any) error {
 }
 
 func Write[T any](w http.ResponseWriter, status int, data T) error {
-	return writeJSON(w, status, struct {
-		Data T `json:"data"`
-	}{Data: data})
+	return writeJSON(w, status, data)
 }
 
 func Error(w http.ResponseWriter, status int, message string) error {

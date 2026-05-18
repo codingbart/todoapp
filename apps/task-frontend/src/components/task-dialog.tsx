@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { useEffect } from 'react';
 import { type Task, type TaskPriority, type TaskStatus } from '@/types/task';
 import { useTaskForm } from '@/hooks/use-task-form';
 import { Button } from '@/components/ui/button';
@@ -30,11 +30,30 @@ type TaskDialogProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSubmit: (task: Task) => void;
+    task?: Task | null;
 };
 
-export function TaskDialog({ open, onOpenChange, onSubmit }: TaskDialogProps) {
-    const { form, reset, setTitle, setDescription, setStatus, setPriority, setDueDate } =
+export function TaskDialog({ open, onOpenChange, onSubmit, task }: TaskDialogProps) {
+    const { form, reset, setAll, setTitle, setDescription, setStatus, setPriority, setDueDate } =
         useTaskForm();
+
+    const isEdit = !!task;
+
+    useEffect(() => {
+        if (!open) return;
+        if (task) {
+            setAll({
+                title: task.title,
+                description: task.description,
+                status: task.status,
+                priority: task.priority,
+                dueDate: task.dueDate
+            });
+        } else {
+            reset();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open, task]);
 
     function handleOpenChange(open: boolean) {
         if (!open) reset();
@@ -44,10 +63,9 @@ export function TaskDialog({ open, onOpenChange, onSubmit }: TaskDialogProps) {
     function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
         e.preventDefault();
         onSubmit({
-            id: String(Date.now()),
+            id: task?.id ?? String(Date.now()),
             ...form,
-            dueDate: dayjs(form.dueDate),
-            createdAt: dayjs()
+            createdAt: task?.createdAt ?? ''
         });
         onOpenChange(false);
     }
@@ -56,7 +74,7 @@ export function TaskDialog({ open, onOpenChange, onSubmit }: TaskDialogProps) {
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Nowe zadanie</DialogTitle>
+                    <DialogTitle>{isEdit ? 'Edytuj zadanie' : 'Nowe zadanie'}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className='space-y-4'>
                     <FormField label='Tytuł'>
@@ -111,7 +129,7 @@ export function TaskDialog({ open, onOpenChange, onSubmit }: TaskDialogProps) {
                     </FormField>
                     <div className='flex gap-2 pt-2'>
                         <Button type='submit' className='flex-1'>
-                            Utwórz zadanie
+                            {isEdit ? 'Zapisz zmiany' : 'Utwórz zadanie'}
                         </Button>
                         <Button
                             type='button'

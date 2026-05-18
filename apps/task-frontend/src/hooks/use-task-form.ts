@@ -24,11 +24,12 @@ export function useTaskForm() {
         setForm(emptyForm);
     }
 
+    const setAll = (data: TaskFormData) => setForm(data);
     const setTitle = (title: string) => setForm(f => ({ ...f, title }));
     const setDescription = (description: string) => setForm(f => ({ ...f, description }));
     const setStatus = (status: TaskStatus) => setForm(f => ({ ...f, status }));
     const setPriority = (priority: TaskPriority) => setForm(f => ({ ...f, priority }));
     const setDueDate = (dueDate: string) => setForm(f => ({ ...f, dueDate }));
 
-    return { form, reset, setTitle, setDescription, setStatus, setPriority, setDueDate };
+    return { form, reset, setAll, setTitle, setDescription, setStatus, setPriority, setDueDate };
 }

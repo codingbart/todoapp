@@ -18,8 +18,8 @@ function toTask(res: TaskTaskResponse): Task {
         description: res.description ?? '',
         status: res.status as Task['status'],
         priority: res.priority as Task['priority'],
-        dueDate: dayjs(res.due_date),
-        createdAt: dayjs(res.created_at)
+        dueDate: res.due_date ? dayjs(res.due_date).format('YYYY-MM-DD') : '',
+        createdAt: res.created_at ?? ''
     };
 }
 
@@ -36,7 +36,7 @@ export const createTask = createAsyncThunk<Task, { userId: string } & Task>(
             description: task.description,
             status: task.status,
             priority: task.priority,
-            due_date: task.dueDate.format('YYYY-MM-DD')
+            due_date: task.dueDate || undefined
         };
 
         const data = await postUsersUserIdTasks(userId, req);
@@ -52,7 +52,7 @@ export const updateTask = createAsyncThunk<Task, { userId: string } & Task>(
             description: task.description,
             status: task.status,
             priority: task.priority,
-            due_date: task.dueDate.format('YYYY-MM-DD')
+            due_date: task.dueDate || undefined
         };
 
         const data = await putUsersUserIdTasksId(userId, task.id, req);

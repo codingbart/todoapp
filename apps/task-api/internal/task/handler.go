@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/codingbart/todoapp/task-api/internal/middleware"
 	"github.com/codingbart/todoapp/task-api/internal/response"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -31,9 +32,9 @@ func NewHandler(service Service) *Handler {
 // @Failure 401 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
-	userID, err := uuid.Parse(chi.URLParam(r, "userId"))
-	if err != nil {
-		response.Error(w, http.StatusBadRequest, "Invalid user ID")
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		response.Error(w, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
 
@@ -65,9 +66,9 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
 func (h *Handler) GetDashboard(w http.ResponseWriter, r *http.Request) {
-	userID, err := uuid.Parse(chi.URLParam(r, "userId"))
-	if err != nil {
-		response.Error(w, http.StatusBadRequest, "Invalid user ID")
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		response.Error(w, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
 
@@ -122,9 +123,9 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
-	userID, err := uuid.Parse(chi.URLParam(r, "userId"))
-	if err != nil {
-		response.Error(w, http.StatusBadRequest, "Invalid user ID")
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		response.Error(w, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
 

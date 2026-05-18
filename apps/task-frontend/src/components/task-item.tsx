@@ -1,4 +1,4 @@
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { type VariantProps } from 'class-variance-authority';
 import { type Task, type TaskPriority, type TaskStatus } from '@/types/task';
 import { Badge, badgeVariants } from '@/components/ui/badge';
@@ -32,10 +32,11 @@ const statusVariants: Record<TaskStatus, BadgeVariant> = {
 
 type TaskItemProps = {
     task: Task;
+    onEdit: (task: Task) => void;
     onDelete: (id: string) => void;
 };
 
-export function TaskItem({ task, onDelete }: TaskItemProps) {
+export function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
     return (
         <div className='flex items-center gap-4 px-4 py-3'>
             <div className='min-w-0 flex-1'>
@@ -54,8 +55,11 @@ export function TaskItem({ task, onDelete }: TaskItemProps) {
                     {statusLabels[task.status]}
                 </Badge>
                 <span className='text-muted-foreground w-24 text-right text-xs'>
-                    {task.dueDate.isValid() ? task.dueDate.format('YYYY-MM-DD') : '—'}
+                    {task.dueDate || '—'}
                 </span>
+                <Button variant='ghost' size='icon-sm' onClick={() => onEdit(task)}>
+                    <Pencil />
+                </Button>
                 <Button variant='ghost' size='icon-sm' onClick={() => onDelete(task.id)}>
                     <Trash2 />
                 </Button>
