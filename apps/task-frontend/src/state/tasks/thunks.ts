@@ -2,9 +2,11 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
     getUsersUserIdTasks,
     postUsersUserIdTasks,
+    putUsersUserIdTasksId,
     deleteUsersUserIdTasksId,
     type TaskTaskResponse,
-    type TaskCreateTaskRequest
+    type TaskCreateTaskRequest,
+    type TaskUpdateTaskRequest
 } from '@/generated/task-api';
 import { type Task } from '@/types/task';
 import dayjs from 'dayjs';
@@ -38,6 +40,22 @@ export const createTask = createAsyncThunk<Task, { userId: string } & Task>(
         };
 
         const data = await postUsersUserIdTasks(userId, req);
+        return toTask(data);
+    }
+);
+
+export const updateTask = createAsyncThunk<Task, { userId: string } & Task>(
+    'tasks/update',
+    async ({ userId, ...task }) => {
+        const req: TaskUpdateTaskRequest = {
+            title: task.title,
+            description: task.description,
+            status: task.status,
+            priority: task.priority,
+            due_date: task.dueDate.format('YYYY-MM-DD')
+        };
+
+        const data = await putUsersUserIdTasksId(userId, task.id, req);
         return toTask(data);
     }
 );
