@@ -60,7 +60,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/task.DashboardSingleResponse"
+                            "$ref": "#/definitions/task.DashboardResponse"
                         }
                     },
                     "400": {
@@ -120,7 +120,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/task.TaskListResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/task.TaskResponse"
+                            }
                         }
                     },
                     "400": {
@@ -175,7 +178,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/task.TaskSingleResponse"
+                            "$ref": "#/definitions/task.TaskResponse"
                         }
                     },
                     "400": {
@@ -230,7 +233,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/task.TaskSingleResponse"
+                            "$ref": "#/definitions/task.TaskResponse"
                         }
                     },
                     "400": {
@@ -298,7 +301,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/task.TaskSingleResponse"
+                            "$ref": "#/definitions/task.TaskResponse"
                         }
                     },
                     "400": {
@@ -388,6 +391,9 @@ const docTemplate = `{
     "definitions": {
         "health.HealthResponse": {
             "type": "object",
+            "required": [
+                "status"
+            ],
             "properties": {
                 "status": {
                     "type": "string"
@@ -396,6 +402,9 @@ const docTemplate = `{
         },
         "response.ErrorResponse": {
             "type": "object",
+            "required": [
+                "error"
+            ],
             "properties": {
                 "error": {
                     "type": "string"
@@ -404,6 +413,11 @@ const docTemplate = `{
         },
         "task.CreateTaskRequest": {
             "type": "object",
+            "required": [
+                "priority",
+                "status",
+                "title"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -422,17 +436,73 @@ const docTemplate = `{
                 }
             }
         },
-        "task.DashboardSingleResponse": {
-            "type": "object"
+        "task.DashboardResponse": {
+            "type": "object",
+            "required": [
+                "done",
+                "in_progress",
+                "todo",
+                "total"
+            ],
+            "properties": {
+                "done": {
+                    "type": "integer"
+                },
+                "in_progress": {
+                    "type": "integer"
+                },
+                "todo": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
         },
-        "task.TaskListResponse": {
-            "type": "object"
-        },
-        "task.TaskSingleResponse": {
-            "type": "object"
+        "task.TaskResponse": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "priority",
+                "status",
+                "title",
+                "updated_at"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
         },
         "task.UpdateTaskRequest": {
             "type": "object",
+            "required": [
+                "priority",
+                "status",
+                "title"
+            ],
             "properties": {
                 "description": {
                     "type": "string"

@@ -1,36 +1,51 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import {
+    getUsersUserIdTasks,
+    postUsersUserIdTasks,
+    deleteUsersUserIdTasksId,
+    type TaskTaskResponse,
+    type TaskCreateTaskRequest
+} from '@/generated/task-api';
 import { type Task } from '@/types/task';
+import dayjs from 'dayjs';
 
-async function dummy_fetch() {
-    return new Response('[]');
+function toTask(res: TaskTaskResponse): Task {
+    return {
+        id: res.id,
+        title: res.title,
+        description: res.description ?? '',
+        status: res.status as Task['status'],
+        priority: res.priority as Task['priority'],
+        dueDate: dayjs(res.due_date),
+        createdAt: dayjs(res.created_at)
+    };
 }
 
-export const fetchTasks = createAsyncThunk<Task[], string>('tasks/fetchAll', async (_userId) => {
-    const res = await dummy_fetch(); // TODO: GET /api/users/:userId/tasks
-
-    if (!res.ok) {
-        throw new Error('Failed to fetch tasks');
-    }
-
-    return res.json();
+export const fetchTasks = createAsyncThunk<Task[], string>('tasks/fetchAll', async userId => {
+    const data = await getUsersUserIdTasks(userId);
+    return data.map(toTask);
 });
 
-export const createTask = createAsyncThunk<Task, Task>('tasks/create', async (_task) => {
-    const res = await dummy_fetch(); // TODO: POST /api/tasks with _task body
+export const createTask = createAsyncThunk<Task, { userId: string } & Task>(
+    'tasks/create',
+    async ({ userId, ...task }) => {
+        const req: TaskCreateTaskRequest = {
+            title: task.title,
+            description: task.description,
+            status: task.status,
+            priority: task.priority,
+            due_date: task.dueDate.format('YYYY-MM-DD')
+        };
 
-    if (!res.ok) {
-        throw new Error('Failed to create task');
+        const data = await postUsersUserIdTasks(userId, req);
+        return toTask(data);
     }
+);
 
-    return _task; // TODO: return res.json()
-});
-
-export const deleteTask = createAsyncThunk<string, string>('tasks/delete', async (_id) => {
-    const res = await dummy_fetch(); // TODO: DELETE /api/tasks/:_id
-
-    if (!res.ok) {
-        throw new Error('Failed to delete task');
+export const deleteTask = createAsyncThunk<string, { userId: string; id: string }>(
+    'tasks/delete',
+    async ({ userId, id }) => {
+        await deleteUsersUserIdTasksId(userId, id);
+        return id;
     }
-
-    return _id;
-});
+);

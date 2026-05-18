@@ -1,9 +1,5 @@
 package response
 
 type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
-type Response[T any] struct {
-	Data T `json:"data"`
+	Error string `json:"error" validate:"required"`
 }

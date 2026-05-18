@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { type Task, type TaskPriority, type TaskStatus } from '@/types/task';
 import { useTaskForm } from '@/hooks/use-task-form';
 import { Button } from '@/components/ui/button';
@@ -14,15 +15,15 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 
 const statusLabels: Record<TaskStatus, string> = {
-    TODO: 'Do zrobienia',
-    IN_PROGRESS: 'W toku',
-    DONE: 'Ukończone'
+    todo: 'Do zrobienia',
+    in_progress: 'W toku',
+    done: 'Ukończone'
 };
 
 const priorityLabels: Record<TaskPriority, string> = {
-    LOW: 'Niski',
-    MEDIUM: 'Średni',
-    HIGH: 'Wysoki'
+    low: 'Niski',
+    medium: 'Średni',
+    high: 'Wysoki'
 };
 
 type TaskDialogProps = {
@@ -45,7 +46,8 @@ export function TaskDialog({ open, onOpenChange, onSubmit }: TaskDialogProps) {
         onSubmit({
             id: String(Date.now()),
             ...form,
-            createdAt: new Date().toISOString().split('T')[0]
+            dueDate: dayjs(form.dueDate),
+            createdAt: dayjs()
         });
         onOpenChange(false);
     }
@@ -79,9 +81,9 @@ export function TaskDialog({ open, onOpenChange, onSubmit }: TaskDialogProps) {
                                 <SelectValue>{statusLabels[form.status]}</SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value='TODO'>Do zrobienia</SelectItem>
-                                <SelectItem value='IN_PROGRESS'>W toku</SelectItem>
-                                <SelectItem value='DONE'>Ukończone</SelectItem>
+                                <SelectItem value='todo'>Do zrobienia</SelectItem>
+                                <SelectItem value='in_progress'>W toku</SelectItem>
+                                <SelectItem value='done'>Ukończone</SelectItem>
                             </SelectContent>
                         </Select>
                     </FormField>
@@ -94,9 +96,9 @@ export function TaskDialog({ open, onOpenChange, onSubmit }: TaskDialogProps) {
                                 <SelectValue>{priorityLabels[form.priority]}</SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value='LOW'>Niski</SelectItem>
-                                <SelectItem value='MEDIUM'>Średni</SelectItem>
-                                <SelectItem value='HIGH'>Wysoki</SelectItem>
+                                <SelectItem value='low'>Niski</SelectItem>
+                                <SelectItem value='medium'>Średni</SelectItem>
+                                <SelectItem value='high'>Wysoki</SelectItem>
                             </SelectContent>
                         </Select>
                     </FormField>

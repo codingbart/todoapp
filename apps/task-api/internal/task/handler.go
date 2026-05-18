@@ -26,7 +26,7 @@ func NewHandler(service Service) *Handler {
 // @Param userId path string true "User ID"
 // @Param status query string false "Filter by status (todo, in_progress, done)"
 // @Param priority query string false "Filter by priority (low, medium, high)"
-// @Success 200 {object} TaskListResponse
+// @Success 200 {array} TaskResponse
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 401 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
@@ -60,7 +60,7 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Summary Get task summary dashboard for a user
 // @Security Keycloak
 // @Param userId path string true "User ID"
-// @Success 200 {object} DashboardSingleResponse
+// @Success 200 {object} DashboardResponse
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 401 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
@@ -86,7 +86,7 @@ func (h *Handler) GetDashboard(w http.ResponseWriter, r *http.Request) {
 // @Security Keycloak
 // @Param userId path string true "User ID"
 // @Param id path string true "Task ID"
-// @Success 200 {object} TaskSingleResponse
+// @Success 200 {object} TaskResponse
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 401 {object} response.ErrorResponse
 // @Failure 404 {object} response.ErrorResponse
@@ -117,7 +117,7 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 // @Security Keycloak
 // @Param userId path string true "User ID"
 // @Param body body CreateTaskRequest true "Task data"
-// @Success 201 {object} TaskSingleResponse
+// @Success 201 {object} TaskResponse
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 401 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
@@ -155,7 +155,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // @Param userId path string true "User ID"
 // @Param id path string true "Task ID"
 // @Param body body UpdateTaskRequest true "Task data"
-// @Success 200 {object} TaskSingleResponse
+// @Success 200 {object} TaskResponse
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 401 {object} response.ErrorResponse
 // @Failure 404 {object} response.ErrorResponse

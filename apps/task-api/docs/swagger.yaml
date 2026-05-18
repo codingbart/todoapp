@@ -3,11 +3,15 @@ definitions:
     properties:
       status:
         type: string
+    required:
+    - status
     type: object
   response.ErrorResponse:
     properties:
       error:
         type: string
+    required:
+    - error
     type: object
   task.CreateTaskRequest:
     properties:
@@ -21,12 +25,52 @@ definitions:
         type: string
       title:
         type: string
+    required:
+    - priority
+    - status
+    - title
     type: object
-  task.DashboardSingleResponse:
+  task.DashboardResponse:
+    properties:
+      done:
+        type: integer
+      in_progress:
+        type: integer
+      todo:
+        type: integer
+      total:
+        type: integer
+    required:
+    - done
+    - in_progress
+    - todo
+    - total
     type: object
-  task.TaskListResponse:
-    type: object
-  task.TaskSingleResponse:
+  task.TaskResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      due_date:
+        type: string
+      id:
+        type: string
+      priority:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - created_at
+    - id
+    - priority
+    - status
+    - title
+    - updated_at
     type: object
   task.UpdateTaskRequest:
     properties:
@@ -40,6 +84,10 @@ definitions:
         type: string
       title:
         type: string
+    required:
+    - priority
+    - status
+    - title
     type: object
 info:
   contact: {}
@@ -71,7 +119,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/task.DashboardSingleResponse'
+            $ref: '#/definitions/task.DashboardResponse'
         "400":
           description: Bad Request
           schema:
@@ -109,7 +157,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/task.TaskListResponse'
+            items:
+              $ref: '#/definitions/task.TaskResponse'
+            type: array
         "400":
           description: Bad Request
           schema:
@@ -144,7 +194,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/task.TaskSingleResponse'
+            $ref: '#/definitions/task.TaskResponse'
         "400":
           description: Bad Request
           schema:
@@ -215,7 +265,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/task.TaskSingleResponse'
+            $ref: '#/definitions/task.TaskResponse'
         "400":
           description: Bad Request
           schema:
@@ -259,7 +309,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/task.TaskSingleResponse'
+            $ref: '#/definitions/task.TaskResponse'
         "400":
           description: Bad Request
           schema:

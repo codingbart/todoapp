@@ -21,8 +21,8 @@ export function useTasks() {
     return {
         tasks,
         status,
-        addTask: (task: Task) => dispatch(createTask(task)),
-        deleteTask: (id: string) => dispatch(deleteTask(id)),
+        addTask: (task: Task) => dispatch(createTask({ userId, ...task })),
+        deleteTask: (id: string) => dispatch(deleteTask({ userId, id })),
         countTasksByStatus
     };
 }

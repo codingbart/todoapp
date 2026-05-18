@@ -12,8 +12,8 @@ export type TaskFormData = {
 const emptyForm: TaskFormData = {
     title: '',
     description: '',
-    status: 'TODO',
-    priority: 'MEDIUM',
+    status: 'todo',
+    priority: 'medium',
     dueDate: ''
 };
 

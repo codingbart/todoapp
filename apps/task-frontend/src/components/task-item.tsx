@@ -7,27 +7,27 @@ import { Button } from '@/components/ui/button';
 type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>['variant']>;
 
 const statusLabels: Record<TaskStatus, string> = {
-    TODO: 'Do zrobienia',
-    IN_PROGRESS: 'W toku',
-    DONE: 'Ukończone',
+    todo: 'Do zrobienia',
+    in_progress: 'W toku',
+    done: 'Ukończone',
 };
 
 const priorityLabels: Record<TaskPriority, string> = {
-    LOW: 'Niski',
-    MEDIUM: 'Średni',
-    HIGH: 'Wysoki',
+    low: 'Niski',
+    medium: 'Średni',
+    high: 'Wysoki',
 };
 
 const priorityVariants: Record<TaskPriority, BadgeVariant> = {
-    HIGH: 'destructive',
-    MEDIUM: 'warning',
-    LOW: 'outline',
+    high: 'destructive',
+    medium: 'warning',
+    low: 'outline',
 };
 
 const statusVariants: Record<TaskStatus, BadgeVariant> = {
-    DONE: 'success',
-    IN_PROGRESS: 'warning',
-    TODO: 'secondary',
+    done: 'success',
+    in_progress: 'warning',
+    todo: 'secondary',
 };
 
 type TaskItemProps = {
@@ -53,7 +53,9 @@ export function TaskItem({ task, onDelete }: TaskItemProps) {
                 <Badge variant={statusVariants[task.status]}>
                     {statusLabels[task.status]}
                 </Badge>
-                <span className='text-muted-foreground w-24 text-right text-xs'>{task.dueDate}</span>
+                <span className='text-muted-foreground w-24 text-right text-xs'>
+                    {task.dueDate.isValid() ? task.dueDate.format('YYYY-MM-DD') : '—'}
+                </span>
                 <Button variant='ghost' size='icon-sm' onClick={() => onDelete(task.id)}>
                     <Trash2 />
                 </Button>
