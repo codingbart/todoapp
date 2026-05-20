@@ -1,4 +1,4 @@
-import { LogOut, User } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import {
     DropdownMenu,
@@ -41,10 +41,6 @@ export function ProfileMenu() {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        <User />
-                        Profil
-                    </DropdownMenuItem>
                     <DropdownMenuItem variant='destructive' onClick={logout}>
                         <LogOut />
                         Wyloguj
